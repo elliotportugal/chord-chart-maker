@@ -483,27 +483,14 @@ max-width: 100%; margin: 0;
 
 <div class="cifra-area">
   <textarea class="cifra-textarea" id="cifraInput"
-    placeholder="Cole a cifra aqui. Exemplo:
+    placeholder="Cole a cifra aqui com acordes entre [colchetes]. Ex: [Am] [G] [F] [E7]"
+    oninput="onCifraInput()"
+  ></textarea>
+  <div class="cifra-hint">
+    Cole a cifra com acordes entre <code>[colchetes]</code>. Seções entre <code>[colchetes]</code> em linha própria viram títulos de seção.
+  </div>
+</div>
 ```
-
-[Intro]
-[Bm7]  [G7M]  [Bm7]
-
-[Verso]
-[Bm7]
-Meu ar de dominador
-dizia que eu ia ser seu [E7]dono
-e nessa eu dancei! [Bm7]
-
-[Refrão]
-[Em7]Se vens lá das alturas[F#7]
-[G7M] serei seu guia[F#7]”
-oninput=“onCifraInput()”
-></textarea>
-<div class="cifra-hint">
-Cole a cifra com acordes entre <code>[colchetes]</code>. Seções entre <code>[colchetes]</code> em linha própria viram títulos de seção.
-</div>
-</div>
 
   </div>
 
