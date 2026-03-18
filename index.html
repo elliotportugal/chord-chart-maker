@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chord Chart Maker</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;600&family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+/* ── TOKENS ─────────────────────────────────────────────── */
+:root {
+  --bg:       #13120f;
+  --surface:  #1c1b17;
+  --surface2: #242320;
+  --border:   #302e28;
+  --border2:  #3e3c34;
+  --text:     #e8e4d8;
+  --muted:    #7a7568;
+  --dim:      #46433c;
+  --gold:     #c8a84b;
+  --gold2:    #e0c070;
+  --paper:    #f7f4ed;
+  --paper2:   #efeade;
+  --ink:      #1a1814;
+  --ink-mid:  #4a4540;
+  --ink-light:#9a9088;
+  --rule:     #ccc5b0;
+  --chord-bg: #1a1814;
+  --section:  #5c4a28;
+  --red:      #b85050;
+}
+
+- { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { height: 100%; overflow: hidden; }
+
+body {
+background: var(–bg);
+color: var(–text);
+font-family: ‘Lato’, sans-serif;
+display: flex;
+flex-direction: column;
+-webkit-font-smoothing: antialiased;
+}
+
+/* ── HEADER ─────────────────────────────────────────────── */
+header {
+background: var(–surface);
+border-bottom: 1px solid var(–border);
+padding: 0 24px;
+height: 56px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+flex-shrink: 0;
+z-index: 10;
+}
+
+.logo {
+display: flex;
+align-items: baseline;
+gap: 10px;
+}
+.logo-title {
+font-family: ‘Libre Baskerville’, serif;
+font-size: 18px;
+color: var(–gold);
+letter-spacing: 0.01em;
+}
+.logo-sub {
+font-family: ‘IBM Plex Mono’, monospace;
+font-size: 10px;
+color: var(–muted);
+letter-spacing: 0.15em;
+text-transform: uppercase;
+}
+
+.header-right { display: flex; gap: 8px; align-items: center; }
+
+/* ── BUTTONS ────────────────────────────────────────────── */
+.btn {
+border: none; cursor: pointer;
+font-family: ‘Lato’, sans-serif;
+font-size: 12px; font-weight: 700;
+letter-spacing: 0.06em; text-transform: uppercase;
+border-radius: 4px; padding: 7px 14px;
+transition: all 0.15s;
+display: inline-flex; align-items: center; gap: 6px;
+}
+.btn-ghost {
+background: transparent; color: var(–muted);
+border: 1px solid var(–border2);
+}
+.btn-ghost:hover { color: var(–text); border-color: var(–muted); }
+.btn-gold {
+background: var(–gold); color: #13120f; font-weight: 900;
+}
+.btn-gold:hover { background: var(–gold2); transform: translateY(-1px); }
+.btn-sm { padding: 5px 10px; font-size: 11px; }
+.btn-danger { background: transparent; color: var(–red); border: 1px solid transparent; padding: 4px 8px; }
+.btn-danger:hover { border-color: var(–red); background: rgba(184,80,80,0.08); }
+
+/* ── LAYOUT ─────────────────────────────────────────────── */
+.app {
+display: grid;
+grid-template-columns: 220px 1fr 1fr;
+flex: 1;
+overflow: hidden;
+min-height: 0;
+}
+
+/* ── SIDEBAR ────────────────────────────────────────────── */
+.sidebar {
+background: var(–surface);
+border-right: 1px solid var(–border);
+display: flex;
+flex-direction: column;
+overflow: hidden;
+}
+
+.sidebar-head {
+padding: 14px 16px 10px;
+border-bottom: 1px solid var(–border);
+display: flex; align-items: center; justify-content: space-between;
+}
+.sidebar-label {
+font-family: ‘IBM Plex Mono’, monospace;
+font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+color: var(–muted);
+}
+
+.song-list {
+flex: 1; overflow-y: auto; padding: 6px;
+}
+.song-list::-webkit-scrollbar { width: 3px; }
+.song-list::-webkit-scrollbar-thumb { background: var(–border2); }
+
+.song-item {
+padding: 9px 12px; border-radius: 5px; cursor: pointer;
+border: 1px solid transparent;
+transition: all 0.12s; margin-bottom: 2px;
+}
+.song-item:hover { background: var(–surface2); border-color: var(–border); }
+.song-item.active { background: var(–surface2); border-color: var(–gold); }
+.song-item-title {
+font-size: 12px; font-weight: 700; color: var(–text);
+white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.song-item-artist {
+font-size: 10px; color: var(–muted); margin-top: 1px;
+white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.sidebar-footer {
+padding: 10px;
+border-top: 1px solid var(–border);
+display: flex; gap: 6px;
+}
+
+/* ── EDITOR PANEL ───────────────────────────────────────── */
+.panel-editor {
+border-right: 1px solid var(–border);
+display: flex; flex-direction: column; overflow: hidden;
+}
+
+.panel-head {
+padding: 12px 20px;
+border-bottom: 1px solid var(–border);
+display: flex; align-items: center; justify-content: space-between;
+flex-shrink: 0;
+}
+.panel-head-title {
+font-family: ‘IBM Plex Mono’, monospace;
+font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+color: var(–muted);
+}
+
+.meta-row {
+display: grid; grid-template-columns: 1fr 1fr;
+gap: 10px; padding: 14px 20px;
+border-bottom: 1px solid var(–border);
+flex-shrink: 0;
+}
+.meta-row-3 { grid-template-columns: 1fr 1fr 80px; }
+
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field-label {
+font-family: ‘IBM Plex Mono’, monospace;
+font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;
+color: var(–muted);
+}
+.field-input {
+background: var(–surface2);
+border: 1px solid var(–border2);
+color: var(–text);
+padding: 7px 10px; border-radius: 4px;
+font-family: ‘Lato’, sans-serif; font-size: 13px;
+outline: none; transition: border-color 0.15s;
+}
+.field-input:focus { border-color: var(–gold); }
+.field-input::placeholder { color: var(–dim); }
+
+.cifra-area {
+flex: 1; padding: 16px 20px;
+display: flex; flex-direction: column; gap: 8px;
+overflow: hidden;
+}
+
+.cifra-textarea {
+flex: 1;
+background: var(–surface2);
+border: 1px solid var(–border2);
+color: var(–text);
+padding: 14px; border-radius: 6px;
+font-family: ‘IBM Plex Mono’, monospace; font-size: 12px;
+line-height: 1.7; resize: none; outline: none;
+transition: border-color 0.15s;
+}
+.cifra-textarea:focus { border-color: var(–gold); }
+.cifra-textarea::placeholder { color: var(–dim); }
+
+.cifra-hint {
+font-size: 11px; color: var(–dim); line-height: 1.5;
+}
+.cifra-hint code {
+font-family: ‘IBM Plex Mono’, monospace;
+color: var(–muted); font-size: 10px;
+background: var(–surface); padding: 1px 4px; border-radius: 2px;
+}
+
+/* ── PREVIEW PANEL ──────────────────────────────────────── */
+.panel-preview {
+display: flex; flex-direction: column; overflow: hidden;
+background: #e8e3d8;
+}
+
+.preview-head {
+background: var(–surface2);
+padding: 12px 20px;
+border-bottom: 1px solid var(–border);
+display: flex; align-items: center; justify-content: space-between;
+flex-shrink: 0;
+}
+
+.preview-tabs {
+display: flex; gap: 2px;
+}
+.preview-tab {
+padding: 5px 12px; border-radius: 3px; cursor: pointer;
+font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+color: var(–muted); transition: all 0.12s;
+font-family: ‘Lato’, sans-serif; border: none; background: transparent;
+}
+.preview-tab.active { background: var(–surface); color: var(–gold); }
+
+.preview-body {
+flex: 1; overflow-y: auto; padding: 20px;
+}
+.preview-body::-webkit-scrollbar { width: 4px; }
+.preview-body::-webkit-scrollbar-thumb { background: var(–rule); }
+
+/* ── CHORD GRID (the money) ─────────────────────────────── */
+.chart-page {
+background: var(–paper);
+max-width: 680px; margin: 0 auto;
+padding: 32px 36px 40px;
+box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+min-height: 400px;
+font-family: ‘Lato’, sans-serif;
+border-radius: 2px;
+}
+
+.chart-title {
+font-family: ‘Libre Baskerville’, serif;
+font-size: 22px; font-weight: 700;
+color: var(–ink); line-height: 1.2;
+margin-bottom: 2px;
+}
+.chart-artist {
+font-size: 13px; color: var(–ink-mid);
+margin-bottom: 4px;
+}
+.chart-meta {
+font-size: 11px; color: var(–ink-light);
+font-family: ‘IBM Plex Mono’, monospace;
+letter-spacing: 0.08em;
+margin-bottom: 20px;
+padding-bottom: 14px;
+border-bottom: 2px solid var(–ink);
+}
+
+.chart-section { margin-bottom: 16px; }
+
+.section-label {
+font-size: 10px; font-weight: 900;
+letter-spacing: 0.18em; text-transform: uppercase;
+color: var(–section);
+font-family: ‘Lato’, sans-serif;
+margin-bottom: 6px;
+display: flex; align-items: center; gap: 8px;
+}
+.section-label::after {
+content: ‘’;
+flex: 1; height: 1px;
+background: var(–rule);
+}
+
+/* CHORD GRID ROW */
+.chord-row {
+display: flex;
+margin-bottom: 4px;
+border: 1px solid var(–rule);
+border-radius: 3px;
+overflow: hidden;
+}
+
+.chord-cell {
+flex: 1;
+padding: 8px 6px;
+text-align: center;
+border-right: 1px solid var(–rule);
+background: white;
+min-width: 0;
+position: relative;
+}
+.chord-cell:last-child { border-right: none; }
+
+.chord-cell.empty { background: var(–paper); }
+
+.chord-name {
+font-family: ‘Libre Baskerville’, serif;
+font-size: 15px; font-weight: 700;
+color: var(–ink); line-height: 1;
+}
+.chord-name sup {
+font-size: 9px; vertical-align: super;
+font-family: ‘IBM Plex Mono’, monospace;
+}
+
+.chord-cell.split {
+display: flex; align-items: center; justify-content: center; gap: 2px;
+}
+.chord-split-divider {
+font-size: 18px; color: var(–rule); line-height: 1; margin: 0 1px;
+}
+
+/* REPEAT */
+.repeat-row {
+display: flex; align-items: center; gap: 8px;
+margin-bottom: 6px;
+}
+.repeat-bracket {
+background: var(–paper2);
+border: 1px solid var(–rule);
+border-radius: 3px;
+overflow: hidden;
+flex: 1;
+}
+.repeat-bracket .chord-row {
+margin-bottom: 0; border: none; border-radius: 0;
+}
+.repeat-bracket .chord-row:not(:last-child) {
+border-bottom: 1px solid var(–rule);
+}
+.repeat-count {
+font-family: ‘IBM Plex Mono’, monospace;
+font-size: 12px; font-weight: 600;
+color: var(–ink-mid);
+flex-shrink: 0; white-space: nowrap;
+}
+
+/* PERCENT (repeat bar) */
+.chord-percent {
+font-size: 20px; color: var(–ink-light);
+font-family: ‘IBM Plex Mono’, monospace;
+}
+
+/* TEXT OUTPUT */
+.text-output {
+flex: 1; overflow-y: auto; padding: 20px;
+font-family: ‘IBM Plex Mono’, monospace;
+font-size: 12px; line-height: 1.9;
+color: var(–text);
+white-space: pre-wrap;
+background: var(–bg);
+border: none; resize: none; outline: none;
+width: 100%;
+}
+
+/* ── TOAST ──────────────────────────────────────────────── */
+.toast {
+position: fixed; bottom: 20px; right: 20px;
+background: var(–surface2); border: 1px solid var(–border2);
+color: var(–text); padding: 10px 18px; border-radius: 6px;
+font-size: 12px; opacity: 0; transform: translateY(8px);
+transition: all 0.25s; z-index: 999; pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+
+/* ── EMPTY STATE ────────────────────────────────────────── */
+.empty-chart {
+display: flex; flex-direction: column;
+align-items: center; justify-content: center;
+height: 300px; color: var(–ink-light); text-align: center; gap: 10px;
+}
+.empty-chart-icon { font-size: 40px; opacity: 0.25; }
+.empty-chart h3 {
+font-family: ‘Libre Baskerville’, serif;
+font-size: 16px; font-weight: 400; color: var(–ink-mid);
+}
+.empty-chart p { font-size: 12px; }
+
+@media print {
+body { background: white; overflow: visible; }
+header, .sidebar, .panel-editor, .preview-head { display: none !important; }
+.app { display: block; }
+.panel-preview { background: white; overflow: visible; }
+.preview-body { overflow: visible; padding: 0; background: white; }
+.chart-page {
+box-shadow: none; border-radius: 0;
+page-break-after: always;
+max-width: 100%; margin: 0;
+}
+.text-output { display: none; }
+}
+</style>
+
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <span class="logo-title">Chord Chart Maker</span>
+    <span class="logo-sub">cifra → grid</span>
+  </div>
+  <div class="header-right">
+    <button class="btn btn-ghost btn-sm" onclick="copyChordSheetText()">📋 Copiar texto</button>
+    <button class="btn btn-ghost btn-sm" onclick="exportAllPDF()">⬇ PDF (todas)</button>
+    <button class="btn btn-gold btn-sm" onclick="window.print()">🖨 Imprimir</button>
+  </div>
+</header>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-head">
+      <span class="sidebar-label">Músicas (<span id="songCount">0</span>)</span>
+    </div>
+    <div class="song-list" id="songList">
+      <div style="padding:20px 12px;text-align:center;color:var(--dim);font-size:11px;">
+        Adicione músicas abaixo
+      </div>
+    </div>
+    <div class="sidebar-footer">
+      <button class="btn btn-ghost btn-sm" style="flex:1" onclick="newSong()">+ Nova música</button>
+    </div>
+  </div>
+
+  <!-- EDITOR -->
+
+  <div class="panel-editor">
+    <div class="panel-head">
+      <span class="panel-head-title">Editor de cifra</span>
+      <button class="btn btn-danger btn-sm" onclick="deleteSong()" id="btnDelete" style="display:none">✕ Remover</button>
+    </div>
+
+```
+<div class="meta-row meta-row-3">
+  <div class="field">
+    <span class="field-label">Título</span>
+    <input type="text" class="field-input" id="inputTitle" placeholder="Ex: Boa Noite" oninput="syncMeta()">
+  </div>
+  <div class="field">
+    <span class="field-label">Artista</span>
+    <input type="text" class="field-input" id="inputArtist" placeholder="Ex: Djavan" oninput="syncMeta()">
+  </div>
+  <div class="field">
+    <span class="field-label">Tom</span>
+    <input type="text" class="field-input" id="inputKey" placeholder="Bm" oninput="syncMeta()">
+  </div>
+</div>
+
+<div class="cifra-area">
+  <textarea class="cifra-textarea" id="cifraInput"
+    placeholder="Cole a cifra aqui. Exemplo:
+```
+
+[Intro]
+[Bm7]  [G7M]  [Bm7]
+
+[Verso]
+[Bm7]
+Meu ar de dominador
+dizia que eu ia ser seu [E7]dono
+e nessa eu dancei! [Bm7]
+
+[Refrão]
+[Em7]Se vens lá das alturas[F#7]
+[G7M] serei seu guia[F#7]”
+oninput=“onCifraInput()”
+></textarea>
+<div class="cifra-hint">
+Cole a cifra com acordes entre <code>[colchetes]</code>. Seções entre <code>[colchetes]</code> em linha própria viram títulos de seção.
+</div>
+</div>
+
+  </div>
+
+  <!-- PREVIEW -->
+
+  <div class="panel-preview">
+    <div class="preview-head">
+      <div class="preview-tabs">
+        <button class="preview-tab active" onclick="switchTab('grid', this)">Grid</button>
+        <button class="preview-tab" onclick="switchTab('text', this)">Texto ChordSheet</button>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-ghost btn-sm" onclick="copyChordSheetText()">📋 Copiar</button>
+      </div>
+    </div>
+    <div class="preview-body" id="previewGrid">
+      <div class="chart-page">
+        <div class="empty-chart">
+          <div class="empty-chart-icon">🎸</div>
+          <h3>Nenhuma cifra ainda</h3>
+          <p>Cole uma cifra no editor ao lado</p>
+        </div>
+      </div>
+    </div>
+    <textarea class="text-output" id="previewText" readonly style="display:none"></textarea>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── STATE ────────────────────────────────────────────────
+let songs = [];
+let activeSongId = null;
+let activeTab = 'grid';
+let debounceTimer = null;
+
+// ── CHORD NORMALIZATION ──────────────────────────────────
+function normalizeChord(raw) {
+  let c = raw.trim();
+  if (!c) return null;
+
+  // Remove parenthetical extensions: (9), (5+), (b5), (11+) etc.
+  c = c.replace(/\([^)]*\)/g, '');
+
+  // maj7 variants
+  c = c.replace(/[Mm]aj7/gi, 'maj7');
+  c = c.replace(/7M$/, 'maj7');
+  c = c.replace(/M7$/, 'maj7');
+
+  // Minor variants
+  c = c.replace(/([A-G][b#]?)mi\b/g, '$1m');
+  c = c.replace(/([A-G][b#]?)-(?=[^0-9]|$)/g, '$1m');
+
+  // Lowercase root = minor
+  c = c.replace(/^([a-g])([b#]?)(.*)$/, (_, r, acc, rest) =>
+    r.toUpperCase() + acc + (rest || 'm')
+  );
+
+  // Flatten ♭ symbol
+  c = c.replace(/♭/g, 'b');
+  // Sharp ♯
+  c = c.replace(/♯/g, '#');
+
+  return c.trim() || null;
+}
+
+// ── PARSER: cifra → sections ─────────────────────────────
+// Each section: { name: string|null, blocks: [...] }
+// Each block: { type: 'row'|'repeat', chords: [], rows: [], count: 1 }
+// chord token: { chord: string } or { chord: string, chord2: string } (split bar)
+
+function parseCifra(text) {
+  const lines = text.split('\n');
+  const sections = [];
+  let curSection = null;
+  let curChords = []; // flat list of chord tokens for current section
+
+  const pushSection = () => {
+    if (curSection !== null || curChords.length > 0) {
+      sections.push({ name: curSection, chords: [...curChords] });
+    }
+  };
+
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+    if (!line) continue;
+
+    // Directives {title:} etc — skip
+    if (/^\{.+\}$/.test(line)) continue;
+
+    // [SectionName] alone on a line (not a chord)
+    const bracketLine = line.match(/^\[([^\]]+)\]$/);
+    if (bracketLine) {
+      const inner = bracketLine[1].trim();
+      // Is it a chord? (starts A-G, short, no spaces)
+      const isChord = /^[A-G][b#]?/.test(inner) && inner.length <= 10 && !inner.includes(' ');
+      if (!isChord) {
+        pushSection();
+        curSection = inner;
+        curChords = [];
+        continue;
+      }
+    }
+
+    // Extract chords from line
+    const chordRegex = /\[([^\]]+)\]/g;
+    let match;
+    while ((match = chordRegex.exec(line)) !== null) {
+      const raw = match[1].trim();
+      if (!raw || raw.includes(' ') || raw.length > 14) continue;
+      const norm = normalizeChord(raw);
+      if (norm) curChords.push(norm);
+    }
+  }
+
+  pushSection();
+
+  // If only one nameless section, keep it
+  if (sections.length === 0) return [];
+  return sections;
+}
+
+// ── CHORDS → ROWS (4 per row) ────────────────────────────
+function chordsToRows(chords) {
+  const rows = [];
+  for (let i = 0; i < chords.length; i += 4) {
+    rows.push(chords.slice(i, i + 4));
+  }
+  return rows;
+}
+
+// ── RENDER CHORD NAME (HTML) ─────────────────────────────
+function renderChordName(chord) {
+  if (!chord || chord === '%') return `<span class="chord-percent">%</span>`;
+  // Split on _ for split bars — handled at cell level
+  // Superscript: everything after root+accidental
+  const m = chord.match(/^([A-G][b#]?)(.*)$/);
+  if (!m) return `<span class="chord-name">${chord}</span>`;
+  const root = m[1];
+  const qual = m[2] || '';
+  if (!qual) return `<span class="chord-name">${root}</span>`;
+  return `<span class="chord-name">${root}<sup>${qual}</sup></span>`;
+}
+
+// ── RENDER GRID HTML ─────────────────────────────────────
+function renderGrid(song) {
+  const sections = parseCifra(song.cifra || '');
+  const title = song.title || 'Sem título';
+  const artist = song.artist || '';
+  const key = song.key || '';
+
+  let html = `<div class="chart-page" data-song-id="${song.id}">`;
+
+  // Header
+  html += `<div class="chart-title">${escHtml(title)}</div>`;
+  if (artist) html += `<div class="chart-artist">${escHtml(artist)}</div>`;
+
+  const metaParts = [];
+  if (key) metaParts.push(`Tom: ${key}`);
+  html += `<div class="chart-meta">${metaParts.join(' · ') || '&nbsp;'}</div>`;
+
+  if (sections.length === 0) {
+    html += `<div class="empty-chart"><div class="empty-chart-icon">🎵</div><p>Nenhum acorde encontrado</p></div>`;
+    html += `</div>`;
+    return html;
+  }
+
+  for (const section of sections) {
+    html += `<div class="chart-section">`;
+    if (section.name) {
+      html += `<div class="section-label">${escHtml(section.name)}</div>`;
+    }
+
+    const rows = chordsToRows(section.chords);
+    for (const row of rows) {
+      // Pad to 4
+      const cells = [...row];
+      while (cells.length < 4) cells.push(null);
+
+      html += `<div class="chord-row">`;
+      for (const cell of cells) {
+        if (!cell) {
+          html += `<div class="chord-cell empty"></div>`;
+        } else if (cell.includes('_')) {
+          // Split bar: two chords
+          const parts = cell.split('_');
+          html += `<div class="chord-cell split">
+            ${renderChordName(parts[0])}
+            <span class="chord-split-divider">/</span>
+            ${renderChordName(parts[1])}
+          </div>`;
+        } else {
+          html += `<div class="chord-cell">${renderChordName(cell)}</div>`;
+        }
+      }
+      html += `</div>`;
+    }
+
+    html += `</div>`;
+  }
+
+  html += `</div>`;
+  return html;
+}
+
+// ── RENDER CHORDSHEET TEXT ───────────────────────────────
+function renderChordSheetText(song) {
+  const sections = parseCifra(song.cifra || '');
+  const lines = [];
+
+  const titleLine = song.artist ? `${song.title} – ${song.artist}` : (song.title || 'Sem título');
+  lines.push(`- ${titleLine}`);
+  if (song.key) lines.push(`- Tom: ${song.key}`);
+  lines.push('');
+
+  for (const section of sections) {
+    if (section.name) lines.push(`: ${section.name}`);
+    if (section.chords.length === 0) { lines.push(''); continue; }
+
+    for (let i = 0; i < section.chords.length; i += 4) {
+      lines.push(section.chords.slice(i, i + 4).join(' '));
+    }
+    lines.push('');
+  }
+
+  return lines.join('\n').trim();
+}
+
+// ── UI HELPERS ───────────────────────────────────────────
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function switchTab(tab, el) {
+  activeTab = tab;
+  document.querySelectorAll('.preview-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('previewGrid').style.display = tab === 'grid' ? '' : 'none';
+  document.getElementById('previewText').style.display = tab === 'text' ? '' : 'none';
+  if (tab === 'text') updateTextPreview();
+}
+
+// ── SONG MANAGEMENT ──────────────────────────────────────
+let _idCounter = 1;
+function makeId() { return 'song_' + (_idCounter++); }
+
+function newSong() {
+  const song = { id: makeId(), title: '', artist: '', key: '', cifra: '' };
+  songs.push(song);
+  setActive(song.id);
+  renderSongList();
+  document.getElementById('inputTitle').focus();
+}
+
+function deleteSong() {
+  if (!activeSongId) return;
+  if (!confirm('Remover esta música?')) return;
+  songs = songs.filter(s => s.id !== activeSongId);
+  activeSongId = songs.length > 0 ? songs[songs.length - 1].id : null;
+  renderSongList();
+  if (activeSongId) loadSong(activeSongId);
+  else clearEditor();
+}
+
+function setActive(id) {
+  activeSongId = id;
+  renderSongList();
+  loadSong(id);
+}
+
+function loadSong(id) {
+  const song = songs.find(s => s.id === id);
+  if (!song) return;
+  document.getElementById('inputTitle').value = song.title || '';
+  document.getElementById('inputArtist').value = song.artist || '';
+  document.getElementById('inputKey').value = song.key || '';
+  document.getElementById('cifraInput').value = song.cifra || '';
+  document.getElementById('btnDelete').style.display = '';
+  updatePreview();
+}
+
+function clearEditor() {
+  document.getElementById('inputTitle').value = '';
+  document.getElementById('inputArtist').value = '';
+  document.getElementById('inputKey').value = '';
+  document.getElementById('cifraInput').value = '';
+  document.getElementById('btnDelete').style.display = 'none';
+  document.getElementById('previewGrid').innerHTML = `
+    <div class="chart-page">
+      <div class="empty-chart">
+        <div class="empty-chart-icon">🎸</div>
+        <h3>Nenhuma música selecionada</h3>
+        <p>Crie ou selecione uma música</p>
+      </div>
+    </div>`;
+}
+
+function syncMeta() {
+  const song = songs.find(s => s.id === activeSongId);
+  if (!song) return;
+  song.title = document.getElementById('inputTitle').value;
+  song.artist = document.getElementById('inputArtist').value;
+  song.key = document.getElementById('inputKey').value;
+  renderSongList();
+  scheduleUpdate();
+}
+
+function onCifraInput() {
+  const song = songs.find(s => s.id === activeSongId);
+  if (!song) return;
+  song.cifra = document.getElementById('cifraInput').value;
+
+  // Auto-detect title/artist if fields empty
+  if (!song.title) {
+    const lines = song.cifra.split('\n');
+    for (const line of lines) {
+      const clean = line.replace(/\[.*?\]/g, '').trim();
+      if (clean && !clean.startsWith('{')) {
+        if (clean.includes(' - ')) {
+          const parts = clean.split(' - ');
+          if (!document.getElementById('inputArtist').value)
+            document.getElementById('inputArtist').value = song.artist = parts[0].trim();
+          document.getElementById('inputTitle').value = song.title = parts.slice(1).join(' - ').trim();
+        }
+        break;
+      }
+    }
+    renderSongList();
+  }
+
+  scheduleUpdate();
+}
+
+function scheduleUpdate() {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(updatePreview, 120);
+}
+
+function updatePreview() {
+  const song = songs.find(s => s.id === activeSongId);
+  if (!song) return;
+
+  if (activeTab === 'grid') {
+    document.getElementById('previewGrid').innerHTML = renderGrid(song);
+  } else {
+    updateTextPreview();
+  }
+}
+
+function updateTextPreview() {
+  const song = songs.find(s => s.id === activeSongId);
+  if (!song) return;
+  document.getElementById('previewText').value = renderChordSheetText(song);
+}
+
+function renderSongList() {
+  const list = document.getElementById('songList');
+  document.getElementById('songCount').textContent = songs.length;
+
+  if (songs.length === 0) {
+    list.innerHTML = `<div style="padding:20px 12px;text-align:center;color:var(--dim);font-size:11px;">Adicione músicas abaixo</div>`;
+    return;
+  }
+
+  list.innerHTML = songs.map(s => `
+    <div class="song-item ${s.id === activeSongId ? 'active' : ''}" onclick="setActive('${s.id}')">
+      <div class="song-item-title">${escHtml(s.title || '(sem título)')}</div>
+      ${s.artist ? `<div class="song-item-artist">${escHtml(s.artist)}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+// ── COPY CHORDSHEET TEXT ─────────────────────────────────
+function copyChordSheetText() {
+  const song = songs.find(s => s.id === activeSongId);
+  if (!song) { showToast('Nenhuma música selecionada.'); return; }
+  const text = renderChordSheetText(song);
+  navigator.clipboard.writeText(text)
+    .then(() => showToast('Texto copiado! Cole no chordsheet.com'))
+    .catch(() => {
+      document.getElementById('previewText').style.display = '';
+      document.getElementById('previewText').select();
+      document.execCommand('copy');
+      showToast('Copiado!');
+    });
+}
+
+// ── EXPORT ALL PDF (print all charts) ───────────────────
+function exportAllPDF() {
+  if (songs.length === 0) { showToast('Nenhuma música para exportar.'); return; }
+
+  // Build a temporary print container with all pages
+  const container = document.createElement('div');
+  container.id = '_print_all';
+  container.style.cssText = 'position:fixed;left:-9999px;top:0;width:800px;background:white;';
+
+  songs.forEach(song => {
+    const div = document.createElement('div');
+    div.innerHTML = renderGrid(song);
+    div.querySelector('.chart-page').style.pageBreakAfter = 'always';
+    container.appendChild(div);
+  });
+
+  document.body.appendChild(container);
+
+  // Hide normal preview, print all
+  const style = document.createElement('style');
+  style.id = '_print_style';
+  style.textContent = `
+    @media print {
+      body > * { display: none !important; }
+      #_print_all { display: block !important; position: static !important;
+        left: 0 !important; width: 100% !important; background: white !important; }
+      .chart-page { page-break-after: always; box-shadow: none !important;
+        max-width: 100% !important; margin: 0 !important; padding: 24px 28px !important; }
+    }
+  `;
+  document.head.appendChild(style);
+
+  window.print();
+
+  setTimeout(() => {
+    document.body.removeChild(container);
+    document.head.removeChild(style);
+  }, 500);
+}
+
+// ── INIT ─────────────────────────────────────────────────
+newSong();
+
+// ── PWA: Service Worker inline ────────────────────────────
+// Registra um SW que faz o app funcionar offline
+if ('serviceWorker' in navigator) {
+  const swCode = `
+const CACHE = 'chord-chart-v1';
+const ASSETS = [self.location.href];
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
+});
+self.addEventListener('fetch', e => {
+  e.respondWith(
+    caches.match(e.request).then(r => r || fetch(e.request).catch(() => caches.match(e.request)))
+  );
+});
+  `.trim();
+
+  const blob = new Blob([swCode], { type: 'application/javascript' });
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).catch(() => {});
+}
+
+// ── PWA: Manifest dinâmico ────────────────────────────────
+const manifest = {
+  name: 'Chord Chart Maker',
+  short_name: 'ChordChart',
+  description: 'Converta cifras em chord charts profissionais',
+  start_url: './',
+  display: 'standalone',
+  background_color: '#13120f',
+  theme_color: '#13120f',
+  orientation: 'any',
+  icons: [
+    { src: _generateIcon(192), sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+    { src: _generateIcon(512), sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+  ]
+};
+
+function _generateIcon(size) {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  const r = size * 0.12;
+
+  // Background
+  ctx.fillStyle = '#13120f';
+  ctx.beginPath();
+  ctx.roundRect(0, 0, size, size, r);
+  ctx.fill();
+
+  // Grid lines (chord boxes)
+  const pad = size * 0.14;
+  const cols = 2, rows = 3;
+  const cellW = (size - pad * 2) / cols;
+  const cellH = (size - pad * 2 - size * 0.22) / rows;
+  const startY = pad + size * 0.22;
+
+  ctx.strokeStyle = '#c8a84b';
+  ctx.lineWidth = size * 0.025;
+  ctx.strokeRect(pad, startY, size - pad * 2, cellH * rows);
+
+  for (let i = 1; i < cols; i++) {
+    ctx.beginPath();
+    ctx.moveTo(pad + i * cellW, startY);
+    ctx.lineTo(pad + i * cellW, startY + cellH * rows);
+    ctx.stroke();
+  }
+  for (let j = 1; j < rows; j++) {
+    ctx.beginPath();
+    ctx.moveTo(pad, startY + j * cellH);
+    ctx.lineTo(size - pad, startY + j * cellH);
+    ctx.stroke();
+  }
+
+  // Title bar
+  ctx.fillStyle = '#c8a84b';
+  const barH = size * 0.14;
+  ctx.fillRect(pad, pad, size - pad * 2, barH);
+
+  // "C" letter
+  ctx.fillStyle = '#13120f';
+  ctx.font = `900 ${size * 0.1}px serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('C', size / 2, pad + barH / 2);
+
+  // Sample chord letters in cells
+  ctx.fillStyle = '#c8a84b';
+  ctx.font = `700 ${size * 0.09}px serif`;
+  const labels = ['Am', 'G', 'F', 'E7', 'Dm', 'C'];
+  let idx = 0;
+  for (let j = 0; j < rows; j++) {
+    for (let i = 0; i < cols; i++) {
+      ctx.fillText(labels[idx++] || '', pad + i * cellW + cellW / 2, startY + j * cellH + cellH / 2);
+    }
+  }
+
+  return canvas.toDataURL('image/png');
+}
+
+// Inject manifest link dynamically
+const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+const manifestUrl = URL.createObjectURL(manifestBlob);
+const manifestLink = document.createElement('link');
+manifestLink.rel = 'manifest';
+manifestLink.href = manifestUrl;
+document.head.appendChild(manifestLink);
+
+// Apple touch icon
+const appleIcon = document.createElement('link');
+appleIcon.rel = 'apple-touch-icon';
+appleIcon.href = _generateIcon(180);
+document.head.appendChild(appleIcon);
+
+// ── PWA: Install prompt ───────────────────────────────────
+// iOS: mostra dica na primeira visita
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+const isStandalone = window.navigator.standalone;
+const shownBefore = localStorage.getItem('pwa-hint-shown');
+
+if (isIOS && !isStandalone && !shownBefore) {
+  setTimeout(() => {
+    const banner = document.createElement('div');
+    banner.style.cssText = `
+      position:fixed; bottom:0; left:0; right:0;
+      background:#1c1b17; border-top:1px solid #302e28;
+      padding:14px 20px 28px; z-index:9999;
+      font-family:'Lato',sans-serif; font-size:13px; color:#e8e4d8;
+      display:flex; align-items:flex-start; gap:12px;
+    `;
+    banner.innerHTML = `
+      <span style="font-size:24px;flex-shrink:0">📲</span>
+      <div style="flex:1">
+        <div style="font-weight:700;margin-bottom:4px;color:#c8a84b">Instalar como app</div>
+        <div style="color:#7a7568;line-height:1.5">
+          Toque em <strong style="color:#e8e4d8">Compartilhar</strong> 
+          <span style="font-size:16px">⎋</span> e depois em 
+          <strong style="color:#e8e4d8">Adicionar à Tela de Início</strong> para usar offline.
+        </div>
+      </div>
+      <button onclick="this.parentElement.remove()" style="background:none;border:none;color:#7a7568;font-size:20px;cursor:pointer;flex-shrink:0;padding:0">✕</button>
+    `;
+    document.body.appendChild(banner);
+    localStorage.setItem('pwa-hint-shown', '1');
+  }, 2500);
+}
+</script>
+
+</body>
+</html>
