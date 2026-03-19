@@ -16,15 +16,12 @@
         header { background: var(--surf); height: 50px; display: flex; align-items: center; padding: 0 16px; border-bottom: 1px solid var(--bd); gap: 15px; flex-shrink: 0; }
         .app { display: flex; flex: 1; overflow: hidden; }
         
-        /* SIDEBAR */
         .sidebar { width: 220px; background: var(--surf); border-right: 1px solid var(--bd); display: flex; flex-direction: column; }
         .sb-head { padding: 12px; font-size: 10px; font-weight: 900; color: var(--mu); letter-spacing: 1px; border-bottom: 1px solid var(--bd); }
         .song-list { flex: 1; overflow-y: auto; padding: 5px; }
-        .song-item { padding: 8px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; margin-bottom: 2px; transition: 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .song-item:hover { background: var(--surf2); }
+        .song-item { padding: 8px 12px; border-radius: 4px; font-size: 11px; cursor: pointer; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .song-item.active { background: var(--surf2); color: var(--gold); border: 1px solid var(--gold); }
         
-        /* MAIN PANELS */
         .main { flex: 1; display: grid; grid-template-columns: 1fr 1.2fr; overflow: hidden; }
         .panel { display: flex; flex-direction: column; border-right: 1px solid var(--bd); overflow: hidden; }
         .panel-head { padding: 8px 15px; background: var(--surf); border-bottom: 1px solid var(--bd); font-size: 10px; font-weight: 900; color: var(--gold); }
@@ -38,8 +35,7 @@
         
         textarea { flex: 1; background: #0c0c0b; color: #fff; border: none; padding: 15px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; line-height: 1.8; outline: none; resize: none; }
 
-        /* PREVIEW GRID */
-        .grid-body { flex: 1; overflow-y: auto; padding: 40px; background: #1a1917; scrollbar-width: thin; }
+        .grid-body { flex: 1; overflow-y: auto; padding: 40px; background: #1a1917; }
         .rb { background: var(--paper); padding: 50px; width: 100%; max-width: 750px; margin: 0 auto; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: var(--ink); min-height: 100%; }
         .rb-title { font-family: 'Libre Baskerville', serif; font-size: 28px; font-weight: 700; margin-bottom: 5px;}
         .rb-meta { margin-bottom: 20px; border-bottom: 3px solid var(--ink); padding-bottom: 10px; }
@@ -48,13 +44,12 @@
 
         .btn { border: none; cursor: pointer; font-size: 10px; font-weight: 900; border-radius: 4px; padding: 8px 15px; text-transform: uppercase; }
         .btn-add { background: var(--gold); color: #111; margin: 10px; }
-        .btn-del { background: #a04848; color: #fff; padding: 4px 8px; font-size: 9px; }
 
         @media print {
             header, .sidebar, .panel, .tab-bar { display: none !important; }
             .main { display: block; }
             .grid-body { background: white; padding: 0; overflow: visible; }
-            .rb { box-shadow: none; max-width: 100%; padding: 30px; border: none; }
+            .rb { box-shadow: none; max-width: 100%; padding: 30px; border: none; background: white; }
         }
     </style>
 </head>
@@ -80,15 +75,12 @@
                 <input type="text" id="iArtist" placeholder="Artista" oninput="saveCurrent()">
                 <input type="text" id="iKey" placeholder="Tom" oninput="saveCurrent()">
             </div>
-            <textarea id="cifraBruta" placeholder="Cole a cifra completa aqui..." oninput="autoClean()"></textarea>
-            <div style="padding: 10px; border-top: 1px solid var(--bd);">
-                <button class="btn btn-del" onclick="deleteSong()">Excluir Música</button>
-            </div>
+            <textarea id="cifraBruta" placeholder="Cole a cifra aqui..." oninput="autoClean()"></textarea>
         </div>
 
         <div class="panel">
             <div class="tab-bar">
-                <button class="tab active" id="tab-cs" onclick="switchTab('cs')">02. MAPA DE TEXTO</button>
+                <button class="tab active" id="tab-cs" onclick="switchTab('cs')">02. MAPA DE TEXTO (EDITÁVEL)</button>
                 <button class="tab" id="tab-grid" onclick="switchTab('grid')">03. GRADE REAL BOOK</button>
             </div>
             <div id="view-cs" style="display:flex; flex:1; flex-direction:column;">
@@ -102,7 +94,7 @@
 </div>
 
 <script>
-let songs = JSON.parse(localStorage.getItem('roadmap_cache') || '[]');
+let songs = JSON.parse(localStorage.getItem('roadmap_cache_v2') || '[]');
 let currentId = null;
 const W = 600, H = 60, barW = W/4;
 
@@ -123,15 +115,15 @@ function autoClean() {
         let cleanLine = line.trim();
         if (!cleanLine) return;
 
-        // Detecta tags entre colchetes [Intro], [Refrão]
+        // Preserva seções: [Intro], [Refrão], [Segunda Parte]
         let sectionMatch = cleanLine.match(/\[(.*?)\]/);
         if (sectionMatch) {
             mapOutput.push(`: ${sectionMatch[1]}`);
             return;
         }
 
-        // Regex para capturar apenas acordes (filtros básicos)
-        const chords = cleanLine.match(/\b([A-G][b#]?(maj7|m7b5|ø7|m7|7|Δ7|dim7|m|sus4|add9|9|C9|4|D4)?)\b/g);
+        // Filtra apenas acordes rítmicos
+        const chords = cleanLine.match(/\b([A-G][b#]?(maj7|m7b5|ø7|m7|7|Δ7|dim7|m|sus4|add9|9|C9|4|D4|6|13)?)\b/g);
         if (chords && chords.length > 0) {
             mapOutput.push(chords.join('  '));
         }
@@ -143,23 +135,23 @@ function autoClean() {
 }
 
 function renderSVG(line, label) {
-    let svg = `<svg viewBox="0 -25 ${W} ${H+25}" xmlns="http://www.w3.org/2000/svg" style="display:block; width:100%; overflow:visible;">`;
+    let svg = `<svg viewBox="0 -22 ${W} ${H+22}" xmlns="http://www.w3.org/2000/svg" style="display:block; width:100%; overflow:visible;">`;
     const midY = H/2;
     
-    // Pautas horizontais
+    // Linhas horizontais (Pauta)
     svg += `<line x1="0" y1="0" x2="${W}" y2="0" stroke="black" stroke-width="2"/>`;
     svg += `<line x1="0" y1="${H}" x2="${W}" y2="${H}" stroke="black" stroke-width="2"/>`;
     
-    // Barras verticais
+    // Barras verticais (Compassos)
     for(let i=0; i<=4; i++) {
         let sw = (i===0 || i===4) ? 2.5 : 0.8;
         svg += `<line x1="${i*barW}" y1="0" x2="${i*barW}" y2="${H}" stroke="black" stroke-width="${sw}"/>`;
     }
     
-    // Rótulo da Seção (Quadrado preto)
+    // Label de Seção [A] (Flutuante)
     if(label) {
-        svg += `<rect x="0" y="-22" width="20" height="20" fill="black"/>`;
-        svg += `<text x="10" y="-12" fill="white" font-family="serif" font-weight="700" font-size="10" text-anchor="middle" dominant-baseline="central">${label[0].toUpperCase()}</text>`;
+        svg += `<rect x="2" y="-20" width="18" height="18" fill="black"/>`;
+        svg += `<text x="11" y="-11" fill="white" font-family="serif" font-weight="700" font-size="9" text-anchor="middle" dominant-baseline="central">${label[0].toUpperCase()}</text>`;
     }
     
     const chords = line.trim().split(/\s+/);
@@ -171,17 +163,19 @@ function renderSVG(line, label) {
             svg += `<line x1="${cx-10}" y1="${midY+8}" x2="${cx+10}" y2="${midY-8}" stroke="#9a9070" stroke-width="1.5"/>`;
             svg += `<circle cx="${cx-6}" cy="${midY-5}" r="2" fill="#9a9070"/><circle cx="${cx+6}" cy="${midY+5}" r="2" fill="#9a9070"/>`;
         } else {
-            // Separa nota fundamental de extensões para efeito de sobrescrito
-            let root = chord.match(/^[A-G][b#]?/)[0];
-            let qual = chord.substring(root.length).replace(/maj7/gi,'Δ7').replace(/m7b5/gi,'ø7');
-            svg += `<text x="${cx}" y="${midY}" font-family="IBM Plex Mono" font-weight="700" font-size="22" text-anchor="middle" dominant-baseline="central">${root}<tspan dy="-9" font-size="12" font-weight="400">${qual}</tspan></text>`;
+            // Nota fundamental e qualidade (superscript)
+            let match = chord.match(/^([A-G][b#]?)(.*)$/);
+            if(match) {
+                let root = match[1], qual = match[2].replace(/maj7/gi,'Δ7').replace(/m7b5/gi,'ø7');
+                svg += `<text x="${cx}" y="${midY}" font-family="IBM Plex Mono" font-weight="700" font-size="22" text-anchor="middle" dominant-baseline="central">${root}<tspan dy="-9" font-size="12" font-weight="400">${qual}</tspan></text>`;
+            }
         }
     });
     return svg + `</svg>`;
 }
 
 function updateGrid() {
-    const title = document.getElementById('iTitle').value || 'Nova Música';
+    const title = document.getElementById('iTitle').value || 'Música';
     const artist = document.getElementById('iArtist').value || '';
     const key = document.getElementById('iKey').value || '';
     const text = document.getElementById('csEdit').value;
@@ -191,31 +185,30 @@ function updateGrid() {
     const lines = text.split('\n').filter(l => l.trim());
     html += `<div class="rb-sec-group">`;
     
-    lines.forEach((line, idx) => {
+    let processedLines = [];
+    let currentLabel = null;
+
+    lines.forEach((line) => {
         if (line.startsWith(':')) {
-            html += `</div><div class="rb-sec-group">`; // Fecha seção anterior e abre nova
-            let secLabel = line.replace(':', '').trim();
-            // Espia a próxima linha para desenhar o primeiro sistema da seção com o label
-            let nextLine = lines[idx+1] || "";
-            if (!nextLine.startsWith(':')) {
-                html += `<div class="rb-system-wrap">${renderSVG(nextLine, secLabel)}</div>`;
-                lines.splice(idx + 1, 1); // Remove a linha já renderizada
-            }
+            currentLabel = line.replace(':', '').trim();
         } else {
-            html += `<div class="rb-system-wrap">${renderSVG(line, null)}</div>`;
+            processedLines.push({ content: line, label: currentLabel });
+            currentLabel = null; // Só mostra label na primeira linha da seção
         }
+    });
+
+    processedLines.forEach(item => {
+        html += `<div class="rb-system-wrap">${renderSVG(item.content, item.label)}</div>`;
     });
     
     html += `</div>`;
     document.getElementById('out').innerHTML = html;
 }
 
-/* STORAGE LOGIC */
 function createNewSong() {
     const s = { id: Date.now(), title: '', artist: '', key: '', raw: '', clean: '' };
     songs.push(s);
     loadSong(s.id);
-    renderList();
 }
 
 function loadSong(id) {
@@ -238,24 +231,7 @@ function saveCurrent() {
     s.key = document.getElementById('iKey').value;
     s.raw = document.getElementById('cifraBruta').value;
     s.clean = document.getElementById('csEdit').value;
-    localStorage.setItem('roadmap_cache', JSON.stringify(songs));
-    renderList();
-}
-
-function deleteSong() {
-    if(!confirm("Deletar música?")) return;
-    songs = songs.filter(x => x.id !== currentId);
-    localStorage.setItem('roadmap_cache', JSON.stringify(songs));
-    location.reload();
+    localStorage.setItem('roadmap_cache_v2', JSON.stringify(songs));
 }
 
 function renderList() {
-    const list = document.getElementById('songList');
-    list.innerHTML = songs.map(s => `<div class="song-item ${s.id===currentId?'active':''}" onclick="loadSong(${s.id})">${s.title || 'Sem título'}</div>`).join('');
-}
-
-if(songs.length > 0) loadSong(songs[0].id);
-else createNewSong();
-</script>
-</body>
-</html>
