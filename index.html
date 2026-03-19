@@ -13,7 +13,6 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Lato', sans-serif; background: var(--bg); color: var(--tx); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
         
-        /* UI */
         header { background: var(--surf); height: 50px; display: flex; align-items: center; padding: 0 16px; border-bottom: 1px solid var(--bd); gap: 15px; flex-shrink: 0; }
         .app { display: flex; flex: 1; overflow: hidden; }
         
@@ -37,15 +36,15 @@
         .tab { flex: 1; padding: 10px; background: none; border: none; color: var(--mu); font-size: 10px; font-weight: 900; cursor: pointer; border-bottom: 2px solid transparent; }
         .tab.active { color: var(--gold); border-bottom-color: var(--gold); }
         
-        textarea { flex: 1; background: #0c0c0b; color: #fff; border: none; padding: 15px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; line-height: 1.6; outline: none; resize: none; }
+        textarea { flex: 1; background: #0c0c0b; color: #fff; border: none; padding: 15px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; line-height: 1.8; outline: none; resize: none; }
 
         /* PREVIEW GRID */
-        .grid-body { flex: 1; overflow-y: auto; padding: 40px; background: #1a1917; }
+        .grid-body { flex: 1; overflow-y: auto; padding: 40px; background: #1a1917; scrollbar-width: thin; }
         .rb { background: var(--paper); padding: 50px; width: 100%; max-width: 750px; margin: 0 auto; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: var(--ink); min-height: 100%; }
-        .rb-title { font-family: 'Libre Baskerville', serif; font-size: 28px; font-weight: 700; }
-        .rb-meta { margin-bottom: 20px; border-bottom: 3px solid var(--ink); padding-bottom: 5px; }
+        .rb-title { font-family: 'Libre Baskerville', serif; font-size: 28px; font-weight: 700; margin-bottom: 5px;}
+        .rb-meta { margin-bottom: 20px; border-bottom: 3px solid var(--ink); padding-bottom: 10px; }
         .rb-system-wrap { margin-top: -1.5px; position: relative; }
-        .rb-sec-group { margin-bottom: 30px; }
+        .rb-sec-group { margin-bottom: 35px; }
 
         .btn { border: none; cursor: pointer; font-size: 10px; font-weight: 900; border-radius: 4px; padding: 8px 15px; text-transform: uppercase; }
         .btn-add { background: var(--gold); color: #111; margin: 10px; }
@@ -55,7 +54,7 @@
             header, .sidebar, .panel, .tab-bar { display: none !important; }
             .main { display: block; }
             .grid-body { background: white; padding: 0; overflow: visible; }
-            .rb { box-shadow: none; max-width: 100%; padding: 30px; }
+            .rb { box-shadow: none; max-width: 100%; padding: 30px; border: none; }
         }
     </style>
 </head>
@@ -63,38 +62,37 @@
 
 <header>
     <div style="font-family:'Libre Baskerville'; color:var(--gold); font-weight:700">ROADMAP MAKER PRO</div>
-    <button class="btn" style="background:var(--surf2); color:white" onclick="exportPDF()">Exportar PDF</button>
-    <button class="btn" style="background:var(--gold); color:#111" onclick="window.print()">Imprimir</button>
+    <button class="btn" style="background:var(--gold); color:#111; margin-left: auto" onclick="window.print()">Imprimir PDF</button>
 </header>
 
 <div class="app">
     <div class="sidebar">
-        <div class="sb-head">REPERTÓRIO</div>
+        <div class="sb-head">SETLIST</div>
         <div id="songList" class="song-list"></div>
         <button class="btn btn-add" onclick="createNewSong()">+ Nova Música</button>
     </div>
 
     <div class="main">
         <div class="panel">
-            <div class="panel-head">PASSO 01: CIFRA BRUTA (COLAR)</div>
+            <div class="panel-head">01: CIFRA DO CIFRACLUB</div>
             <div class="meta-row">
                 <input type="text" id="iTitle" placeholder="Título" oninput="saveCurrent()">
                 <input type="text" id="iArtist" placeholder="Artista" oninput="saveCurrent()">
                 <input type="text" id="iKey" placeholder="Tom" oninput="saveCurrent()">
             </div>
-            <textarea id="cifraBruta" placeholder="Cole aqui a cifra do Cifra Club..." oninput="autoClean()"></textarea>
-            <div style="padding: 10px; border-top: 1px solid var(--bd); display: flex; justify-content: space-between;">
+            <textarea id="cifraBruta" placeholder="Cole a cifra completa aqui..." oninput="autoClean()"></textarea>
+            <div style="padding: 10px; border-top: 1px solid var(--bd);">
                 <button class="btn btn-del" onclick="deleteSong()">Excluir Música</button>
             </div>
         </div>
 
         <div class="panel">
             <div class="tab-bar">
-                <button class="tab active" id="tab-cs" onclick="switchTab('cs')">02. EDITAR COMPASSOS</button>
-                <button class="tab" id="tab-grid" onclick="switchTab('grid')">03. ROADMAP VISUAL</button>
+                <button class="tab active" id="tab-cs" onclick="switchTab('cs')">02. MAPA DE TEXTO</button>
+                <button class="tab" id="tab-grid" onclick="switchTab('grid')">03. GRADE REAL BOOK</button>
             </div>
             <div id="view-cs" style="display:flex; flex:1; flex-direction:column;">
-                <textarea id="csEdit" style="background:#111" oninput="saveCurrent(); updateGrid();"></textarea>
+                <textarea id="csEdit" oninput="saveCurrent(); updateGrid();" placeholder="O mapa aparecerá aqui..."></textarea>
             </div>
             <div id="view-grid" style="display:none; flex:1;" class="grid-body">
                 <div id="out" class="rb"></div>
@@ -104,7 +102,7 @@
 </div>
 
 <script>
-let songs = JSON.parse(localStorage.getItem('my_repertoire') || '[]');
+let songs = JSON.parse(localStorage.getItem('roadmap_cache') || '[]');
 let currentId = null;
 const W = 600, H = 60, barW = W/4;
 
@@ -118,74 +116,106 @@ function switchTab(t) {
 
 function autoClean() {
     const raw = document.getElementById('cifraBruta').value;
-    // Regex para capturar acordes e ignorar letras
-    const chords = raw.match(/[A-G][b#]?(maj7|m7b5|ø7|m7|7|Δ7|dim7|m|sus4|add9|9|C9)?/g) || [];
-    let clean = "";
-    for(let i=0; i<chords.length; i++) {
-        clean += chords[i] + ((i+1)%4 === 0 ? "\n" : "  ");
-    }
-    document.getElementById('csEdit').value = clean;
+    const lines = raw.split('\n');
+    let mapOutput = [];
+
+    lines.forEach(line => {
+        let cleanLine = line.trim();
+        if (!cleanLine) return;
+
+        // Detecta tags entre colchetes [Intro], [Refrão]
+        let sectionMatch = cleanLine.match(/\[(.*?)\]/);
+        if (sectionMatch) {
+            mapOutput.push(`: ${sectionMatch[1]}`);
+            return;
+        }
+
+        // Regex para capturar apenas acordes (filtros básicos)
+        const chords = cleanLine.match(/\b([A-G][b#]?(maj7|m7b5|ø7|m7|7|Δ7|dim7|m|sus4|add9|9|C9|4|D4)?)\b/g);
+        if (chords && chords.length > 0) {
+            mapOutput.push(chords.join('  '));
+        }
+    });
+
+    document.getElementById('csEdit').value = mapOutput.join('\n');
     saveCurrent();
     updateGrid();
 }
 
-function renderSVG(line, label, isFirst) {
-    let svg = `<svg viewBox="0 -25 ${W} ${H+25}" style="display:block; width:100%; overflow:visible;">`;
+function renderSVG(line, label) {
+    let svg = `<svg viewBox="0 -25 ${W} ${H+25}" xmlns="http://www.w3.org/2000/svg" style="display:block; width:100%; overflow:visible;">`;
     const midY = H/2;
-    // Pauta
+    
+    // Pautas horizontais
     svg += `<line x1="0" y1="0" x2="${W}" y2="0" stroke="black" stroke-width="2"/>`;
     svg += `<line x1="0" y1="${H}" x2="${W}" y2="${H}" stroke="black" stroke-width="2"/>`;
-    // Barlines
+    
+    // Barras verticais
     for(let i=0; i<=4; i++) {
         let sw = (i===0 || i===4) ? 2.5 : 0.8;
         svg += `<line x1="${i*barW}" y1="0" x2="${i*barW}" y2="${H}" stroke="black" stroke-width="${sw}"/>`;
     }
-    // Marca de Seção
+    
+    // Rótulo da Seção (Quadrado preto)
     if(label) {
         svg += `<rect x="0" y="-22" width="20" height="20" fill="black"/>`;
-        svg += `<text x="10" y="-12" fill="white" font-family="serif" font-weight="700" font-size="12" text-anchor="middle" dominant-baseline="central">${label[0].toUpperCase()}</text>`;
+        svg += `<text x="10" y="-12" fill="white" font-family="serif" font-weight="700" font-size="10" text-anchor="middle" dominant-baseline="central">${label[0].toUpperCase()}</text>`;
     }
-    // Chords
+    
     const chords = line.trim().split(/\s+/);
     chords.forEach((chord, i) => {
         if(i > 3) return;
         const cx = i*barW + barW/2;
+        
         if(chord === '%') {
-            svg += `<line x1="${cx-12}" y1="${midY+10}" x2="${cx+12}" y2="${midY-10}" stroke="#9a9070" stroke-width="2"/>`;
-            svg += `<circle cx="${cx-7}" cy="${midY-6}" r="2.5" fill="#9a9070"/><circle cx="${cx+7}" cy="${midY+6}" r="2.5" fill="#9a9070"/>`;
+            svg += `<line x1="${cx-10}" y1="${midY+8}" x2="${cx+10}" y2="${midY-8}" stroke="#9a9070" stroke-width="1.5"/>`;
+            svg += `<circle cx="${cx-6}" cy="${midY-5}" r="2" fill="#9a9070"/><circle cx="${cx+6}" cy="${midY+5}" r="2" fill="#9a9070"/>`;
         } else {
-            let root = chord[0], qual = chord.slice(1).replace(/maj7/gi,'Δ7').replace(/m7b5/gi,'ø7');
-            svg += `<text x="${cx}" y="${midY}" font-family="IBM Plex Mono" font-weight="700" font-size="22" text-anchor="middle" dominant-baseline="central">${root}<tspan dy="-10" font-size="12" font-weight="400">${qual}</tspan></text>`;
+            // Separa nota fundamental de extensões para efeito de sobrescrito
+            let root = chord.match(/^[A-G][b#]?/)[0];
+            let qual = chord.substring(root.length).replace(/maj7/gi,'Δ7').replace(/m7b5/gi,'ø7');
+            svg += `<text x="${cx}" y="${midY}" font-family="IBM Plex Mono" font-weight="700" font-size="22" text-anchor="middle" dominant-baseline="central">${root}<tspan dy="-9" font-size="12" font-weight="400">${qual}</tspan></text>`;
         }
     });
     return svg + `</svg>`;
 }
 
 function updateGrid() {
-    const title = document.getElementById('iTitle').value || 'Música Sem Título';
+    const title = document.getElementById('iTitle').value || 'Nova Música';
     const artist = document.getElementById('iArtist').value || '';
     const key = document.getElementById('iKey').value || '';
     const text = document.getElementById('csEdit').value;
 
-    let html = `<div class="rb-meta"><div class="rb-title">${title}</div><div>${artist} | Tom: ${key}</div></div>`;
+    let html = `<div class="rb-meta"><div class="rb-title">${title}</div><div style="font-family:serif; font-style:italic; opacity:0.8">${artist} | Tom: ${key}</div></div>`;
     
     const lines = text.split('\n').filter(l => l.trim());
     html += `<div class="rb-sec-group">`;
+    
     lines.forEach((line, idx) => {
-        let label = line.startsWith(':') ? line.replace(':','') : (idx === 0 ? 'A' : null);
-        if(line.startsWith(':')) return; // Pula a linha se for só rótulo
-        html += `<div class="rb-system-wrap">${renderSVG(line, label, idx===0)}</div>`;
+        if (line.startsWith(':')) {
+            html += `</div><div class="rb-sec-group">`; // Fecha seção anterior e abre nova
+            let secLabel = line.replace(':', '').trim();
+            // Espia a próxima linha para desenhar o primeiro sistema da seção com o label
+            let nextLine = lines[idx+1] || "";
+            if (!nextLine.startsWith(':')) {
+                html += `<div class="rb-system-wrap">${renderSVG(nextLine, secLabel)}</div>`;
+                lines.splice(idx + 1, 1); // Remove a linha já renderizada
+            }
+        } else {
+            html += `<div class="rb-system-wrap">${renderSVG(line, null)}</div>`;
+        }
     });
+    
     html += `</div>`;
     document.getElementById('out').innerHTML = html;
 }
 
-/* SONG STORAGE */
+/* STORAGE LOGIC */
 function createNewSong() {
-    const newSong = { id: Date.now(), title: '', artist: '', key: '', raw: '', clean: '' };
-    songs.push(newSong);
-    loadSong(newSong.id);
-    renderSongList();
+    const s = { id: Date.now(), title: '', artist: '', key: '', raw: '', clean: '' };
+    songs.push(s);
+    loadSong(s.id);
+    renderList();
 }
 
 function loadSong(id) {
@@ -196,7 +226,7 @@ function loadSong(id) {
     document.getElementById('iKey').value = s.key;
     document.getElementById('cifraBruta').value = s.raw;
     document.getElementById('csEdit').value = s.clean;
-    renderSongList();
+    renderList();
     updateGrid();
 }
 
@@ -208,24 +238,22 @@ function saveCurrent() {
     s.key = document.getElementById('iKey').value;
     s.raw = document.getElementById('cifraBruta').value;
     s.clean = document.getElementById('csEdit').value;
-    localStorage.setItem('my_repertoire', JSON.stringify(songs));
-    renderSongList();
+    localStorage.setItem('roadmap_cache', JSON.stringify(songs));
+    renderList();
 }
 
 function deleteSong() {
-    if(!confirm("Remover esta música?")) return;
+    if(!confirm("Deletar música?")) return;
     songs = songs.filter(x => x.id !== currentId);
-    localStorage.setItem('my_repertoire', JSON.stringify(songs));
-    if(songs.length > 0) loadSong(songs[0].id);
-    else { currentId = null; location.reload(); }
+    localStorage.setItem('roadmap_cache', JSON.stringify(songs));
+    location.reload();
 }
 
-function renderSongList() {
+function renderList() {
     const list = document.getElementById('songList');
-    list.innerHTML = songs.map(s => `<div class="song-item ${s.id===currentId?'active':''}" onclick="loadSong(${s.id})">${s.title || '(Sem Título)'}</div>`).join('');
+    list.innerHTML = songs.map(s => `<div class="song-item ${s.id===currentId?'active':''}" onclick="loadSong(${s.id})">${s.title || 'Sem título'}</div>`).join('');
 }
 
-// Inicializar
 if(songs.length > 0) loadSong(songs[0].id);
 else createNewSong();
 </script>
