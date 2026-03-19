@@ -8,7 +8,7 @@
     <style>
         :root {
             --bg: #0f0e0d; --surf: #181714; --surf2: #211f1c; --bd: #2e2c28;
-            --tx: #e6e2d6; --mu: #746e62; --gold: #c8a84b; --paper: #f5f0e4; --ink: #161310;
+            --tx: #e6e2d6; --mu: #746e62; --gold: #c8a84b; --paper: #f5f0e4; --ink: #161310; --red: #a04848;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Lato', sans-serif; background: var(--bg); color: var(--tx); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
@@ -19,12 +19,15 @@
         .sidebar { width: 220px; background: var(--surf); border-right: 1px solid var(--bd); display: flex; flex-direction: column; }
         .sb-head { padding: 12px; font-size: 10px; font-weight: 900; color: var(--mu); letter-spacing: 1px; border-bottom: 1px solid var(--bd); }
         .song-list { flex: 1; overflow-y: auto; padding: 5px; }
-        .song-item { padding: 8px 12px; border-radius: 4px; font-size: 11px; cursor: pointer; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .song-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-radius: 4px; font-size: 11px; cursor: pointer; margin-bottom: 2px; }
+        .song-item:hover { background: var(--surf2); }
         .song-item.active { background: var(--surf2); color: var(--gold); border: 1px solid var(--gold); }
+        .song-item .del-btn { opacity: 0; color: var(--red); font-weight: bold; padding: 2px 5px; transition: 0.2s; }
+        .song-item:hover .del-btn { opacity: 1; }
         
         .main { flex: 1; display: grid; grid-template-columns: 1fr 1.2fr; overflow: hidden; }
         .panel { display: flex; flex-direction: column; border-right: 1px solid var(--bd); overflow: hidden; }
-        .panel-head { padding: 8px 15px; background: var(--surf); border-bottom: 1px solid var(--bd); font-size: 10px; font-weight: 900; color: var(--gold); }
+        .panel-head { padding: 8px 15px; background: var(--surf); border-bottom: 1px solid var(--bd); font-size: 10px; font-weight: 900; color: var(--gold); display: flex; justify-content: space-between; align-items: center;}
         
         .meta-row { display: grid; grid-template-columns: 1fr 1fr 60px; gap: 8px; padding: 10px; border-bottom: 1px solid var(--bd); }
         input { background: #111; border: 1px solid var(--bd); color: #fff; padding: 6px; border-radius: 4px; font-size: 12px; outline: none; }
@@ -44,6 +47,7 @@
 
         .btn { border: none; cursor: pointer; font-size: 10px; font-weight: 900; border-radius: 4px; padding: 8px 15px; text-transform: uppercase; }
         .btn-add { background: var(--gold); color: #111; margin: 10px; }
+        .btn-update { background: var(--gold); color: #111; font-size: 9px; padding: 4px 8px; }
 
         @media print {
             header, .sidebar, .panel, .tab-bar { display: none !important; }
@@ -69,7 +73,7 @@
 
     <div class="main">
         <div class="panel">
-            <div class="panel-head">01: CIFRA DO CIFRACLUB</div>
+            <div class="panel-head">01: CIFRA BRUTA (EXTRAÇÃO)</div>
             <div class="meta-row">
                 <input type="text" id="iTitle" placeholder="Título" oninput="saveCurrent()">
                 <input type="text" id="iArtist" placeholder="Artista" oninput="saveCurrent()">
@@ -80,10 +84,14 @@
 
         <div class="panel">
             <div class="tab-bar">
-                <button class="tab active" id="tab-cs" onclick="switchTab('cs')">02. MAPA DE TEXTO (EDITÁVEL)</button>
+                <button class="tab active" id="tab-cs" onclick="switchTab('cs')">02. MAPA DE TEXTO</button>
                 <button class="tab" id="tab-grid" onclick="switchTab('grid')">03. GRADE REAL BOOK</button>
             </div>
             <div id="view-cs" style="display:flex; flex:1; flex-direction:column;">
+                <div class="panel-head" style="background:#111; border-top:1px solid var(--bd)">
+                    <span>EDITAR COMPASSOS</span>
+                    <button class="btn btn-update" onclick="updateGrid()">⚡ ATUALIZAR GRADE</button>
+                </div>
                 <textarea id="csEdit" oninput="saveCurrent(); updateGrid();" placeholder="O mapa aparecerá aqui..."></textarea>
             </div>
             <div id="view-grid" style="display:none; flex:1;" class="grid-body">
@@ -94,7 +102,7 @@
 </div>
 
 <script>
-let songs = JSON.parse(localStorage.getItem('roadmap_cache_v2') || '[]');
+let songs = JSON.parse(localStorage.getItem('roadmap_cache_v3') || '[]');
 let currentId = null;
 const W = 600, H = 60, barW = W/4;
 
@@ -114,15 +122,11 @@ function autoClean() {
     lines.forEach(line => {
         let cleanLine = line.trim();
         if (!cleanLine) return;
-
-        // Preserva seções: [Intro], [Refrão], [Segunda Parte]
         let sectionMatch = cleanLine.match(/\[(.*?)\]/);
         if (sectionMatch) {
             mapOutput.push(`: ${sectionMatch[1]}`);
             return;
         }
-
-        // Filtra apenas acordes rítmicos
         const chords = cleanLine.match(/\b([A-G][b#]?(maj7|m7b5|ø7|m7|7|Δ7|dim7|m|sus4|add9|9|C9|4|D4|6|13)?)\b/g);
         if (chords && chords.length > 0) {
             mapOutput.push(chords.join('  '));
@@ -135,35 +139,26 @@ function autoClean() {
 }
 
 function renderSVG(line, label) {
-    let svg = `<svg viewBox="0 -22 ${W} ${H+22}" xmlns="http://www.w3.org/2000/svg" style="display:block; width:100%; overflow:visible;">`;
+    let svg = `<svg viewBox="0 -25 ${W} ${H+25}" xmlns="http://www.w3.org/2000/svg" style="display:block; width:100%; overflow:visible;">`;
     const midY = H/2;
-    
-    // Linhas horizontais (Pauta)
     svg += `<line x1="0" y1="0" x2="${W}" y2="0" stroke="black" stroke-width="2"/>`;
     svg += `<line x1="0" y1="${H}" x2="${W}" y2="${H}" stroke="black" stroke-width="2"/>`;
-    
-    // Barras verticais (Compassos)
     for(let i=0; i<=4; i++) {
         let sw = (i===0 || i===4) ? 2.5 : 0.8;
         svg += `<line x1="${i*barW}" y1="0" x2="${i*barW}" y2="${H}" stroke="black" stroke-width="${sw}"/>`;
     }
-    
-    // Label de Seção [A] (Flutuante)
     if(label) {
         svg += `<rect x="2" y="-20" width="18" height="18" fill="black"/>`;
         svg += `<text x="11" y="-11" fill="white" font-family="serif" font-weight="700" font-size="9" text-anchor="middle" dominant-baseline="central">${label[0].toUpperCase()}</text>`;
     }
-    
     const chords = line.trim().split(/\s+/);
     chords.forEach((chord, i) => {
         if(i > 3) return;
         const cx = i*barW + barW/2;
-        
         if(chord === '%') {
             svg += `<line x1="${cx-10}" y1="${midY+8}" x2="${cx+10}" y2="${midY-8}" stroke="#9a9070" stroke-width="1.5"/>`;
             svg += `<circle cx="${cx-6}" cy="${midY-5}" r="2" fill="#9a9070"/><circle cx="${cx+6}" cy="${midY+5}" r="2" fill="#9a9070"/>`;
         } else {
-            // Nota fundamental e qualidade (superscript)
             let match = chord.match(/^([A-G][b#]?)(.*)$/);
             if(match) {
                 let root = match[1], qual = match[2].replace(/maj7/gi,'Δ7').replace(/m7b5/gi,'ø7');
@@ -181,28 +176,20 @@ function updateGrid() {
     const text = document.getElementById('csEdit').value;
 
     let html = `<div class="rb-meta"><div class="rb-title">${title}</div><div style="font-family:serif; font-style:italic; opacity:0.8">${artist} | Tom: ${key}</div></div>`;
-    
-    const lines = text.split('\n').filter(l => l.trim());
-    html += `<div class="rb-sec-group">`;
-    
-    let processedLines = [];
+    const lines = text.split('\n').map(l => l.trim()).filter(l => l !== "");
     let currentLabel = null;
+    let gridHtml = `<div class="rb-sec-group">`;
 
     lines.forEach((line) => {
         if (line.startsWith(':')) {
             currentLabel = line.replace(':', '').trim();
         } else {
-            processedLines.push({ content: line, label: currentLabel });
-            currentLabel = null; // Só mostra label na primeira linha da seção
+            gridHtml += `<div class="rb-system-wrap">${renderSVG(line, currentLabel)}</div>`;
+            currentLabel = null;
         }
     });
-
-    processedLines.forEach(item => {
-        html += `<div class="rb-system-wrap">${renderSVG(item.content, item.label)}</div>`;
-    });
-    
-    html += `</div>`;
-    document.getElementById('out').innerHTML = html;
+    gridHtml += `</div>`;
+    document.getElementById('out').innerHTML = html + gridHtml;
 }
 
 function createNewSong() {
@@ -214,11 +201,11 @@ function createNewSong() {
 function loadSong(id) {
     currentId = id;
     const s = songs.find(x => x.id === id);
-    document.getElementById('iTitle').value = s.title;
-    document.getElementById('iArtist').value = s.artist;
-    document.getElementById('iKey').value = s.key;
-    document.getElementById('cifraBruta').value = s.raw;
-    document.getElementById('csEdit').value = s.clean;
+    document.getElementById('iTitle').value = s.title || '';
+    document.getElementById('iArtist').value = s.artist || '';
+    document.getElementById('iKey').value = s.key || '';
+    document.getElementById('cifraBruta').value = s.raw || '';
+    document.getElementById('csEdit').value = s.clean || '';
     renderList();
     updateGrid();
 }
@@ -231,7 +218,31 @@ function saveCurrent() {
     s.key = document.getElementById('iKey').value;
     s.raw = document.getElementById('cifraBruta').value;
     s.clean = document.getElementById('csEdit').value;
-    localStorage.setItem('roadmap_cache_v2', JSON.stringify(songs));
+    localStorage.setItem('roadmap_cache_v3', JSON.stringify(songs));
+    renderList();
+}
+
+function deleteSong(id, e) {
+    if(e) e.stopPropagation();
+    if(!confirm("Deletar música do repertório?")) return;
+    songs = songs.filter(x => x.id !== id);
+    localStorage.setItem('roadmap_cache_v3', JSON.stringify(songs));
+    if(songs.length > 0) loadSong(songs[0].id);
+    else location.reload();
 }
 
 function renderList() {
+    const list = document.getElementById('songList');
+    list.innerHTML = songs.map(s => `
+        <div class="song-item ${s.id===currentId?'active':''}" onclick="loadSong(${s.id})">
+            <span>${s.title || 'Música'}</span>
+            <span class="del-btn" onclick="deleteSong(${s.id}, event)">✕</span>
+        </div>
+    `).join('');
+}
+
+if(songs.length > 0) loadSong(songs[0].id);
+else createNewSong();
+</script>
+</body>
+</html>
