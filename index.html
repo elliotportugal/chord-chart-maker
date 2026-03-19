@@ -2,155 +2,125 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Chord Chart Maker - Real Book Style</title>
-<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=IBM+Plex+Mono:wght@400;700&family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chord Chart Maker - Pro Version</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg:#0f0e0d; --surf:#181714; --surf2:#201f1c; --tx:#e6e2d6; --mu:#746e62;
-  --gold:#c8a84b; --pp:#f5f0e4; --ink:#161310;
-}
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Lato',sans-serif;background:var(--bg);color:var(--tx);display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+    :root { --bg: #0f0e0d; --gold: #c8a84b; --paper: #f5f0e4; --ink: #161310; }
+    body { margin: 0; background: var(--bg); color: #e6e2d6; font-family: sans-serif; height: 100vh; display: flex; flex-direction: column; }
+    header { background: #181714; padding: 10px 20px; display: flex; align-items: center; border-bottom: 1px solid #2e2c28; }
+    .main { display: flex; flex: 1; overflow: hidden; }
+    .editor { width: 40%; display: flex; flex-direction: column; border-right: 1px solid #2e2c28; background: #111; }
+    .preview { flex: 1; overflow-y: auto; padding: 40px; background: #201e1a; display: flex; justify-content: center; }
+    
+    textarea { flex: 1; background: transparent; color: #fff; border: none; padding: 20px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; outline: none; resize: none; }
+    .meta { padding: 15px; display: grid; grid-template-columns: 1fr 1fr 60px; gap: 10px; border-bottom: 1px solid #2e2c28; }
+    input { background: #181714; border: 1px solid #3e3c38; color: #fff; padding: 8px; border-radius: 4px; font-size: 12px; }
 
-/* UI Layout */
-header{background:var(--surf);height:50px;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid #2e2c28;gap:10px;}
-.app{display:flex;flex:1;overflow:hidden;}
-.main{flex:1;display:grid;grid-template-columns:1fr 1.2fr;overflow:hidden;}
-.panel{display:flex;flex-direction:column;border-right:1px solid #2e2c28;overflow:hidden;}
-
-/* Editor */
-.meta-row{display:grid;grid-template-columns:1fr 1fr 60px;gap:8px;padding:12px;background:var(--surf);}
-.fi{background:#111;border:1px solid #3e3c38;color:#fff;padding:6px;border-radius:4px;font-size:12px;}
-textarea{flex:1;background:#111;color:#fff;border:none;padding:15px;font-family:'IBM Plex Mono',monospace;font-size:13px;resize:none;outline:none;}
-
-/* Grid Rendering */
-.grid-body{flex:1;overflow-y:auto;padding:40px;background:#1a1917;display:flex;justify-content:center;}
-.rb{background:var(--pp);padding:40px;width:100%;max-width:700px;min-height:100%;box-shadow:0 10px 50px rgba(0,0,0,0.5);color:var(--ink);}
-.rb-title{font-family:'Libre Baskerville',serif;font-size:28px;font-weight:900;margin-bottom:4px;}
-.rb-artist{font-style:italic;margin-bottom:20px;opacity:0.8;}
-
-/* Real Book Architecture */
-.rb-system-wrap {
-  margin-top: -1.5px; /* Funde as linhas horizontais */
-  position: relative;
-}
-.rb-sec-group { margin-bottom: 35px; }
-
-@media print {
-  body * { visibility: hidden; }
-  .grid-body, .rb, .rb * { visibility: visible; }
-  .grid-body { position: absolute; left: 0; top: 0; width: 100%; padding: 0; background: #fff; }
-  .rb { box-shadow: none; max-width: 100%; padding: 20px; }
-}
+    /* Estilo Real Book */
+    .rb { background: var(--paper); color: var(--ink); padding: 50px; width: 100%; max-width: 750px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+    .rb-title { font-family: 'Libre Baskerville', serif; font-size: 32px; font-weight: 700; margin: 0; }
+    .rb-meta { margin-bottom: 25px; border-bottom: 3px solid var(--ink); padding-bottom: 5px; }
+    .rb-system { margin-top: -1.5px; position: relative; }
+    .rb-sec { margin-bottom: 30px; }
+    
+    @media print {
+        header, .editor { display: none; }
+        .preview { background: #fff; padding: 0; }
+        .rb { box-shadow: none; max-width: 100%; }
+    }
 </style>
 </head>
 <body>
 
 <header>
-  <div style="font-family:'Libre Baskerville',serif;color:var(--gold);font-weight:700">Chord Chart Maker</div>
-  <button onclick="window.print()" style="margin-left:auto;padding:5px 15px;background:var(--gold);border:none;border-radius:4px;font-weight:900;cursor:pointer">IMPRIMIR PDF</button>
+    <div style="font-family: 'Libre Baskerville'; color: var(--gold); font-size: 18px;">Chord Chart Maker</div>
+    <button onclick="window.print()" style="margin-left:auto; background:var(--gold); border:none; padding:8px 15px; font-weight:700; cursor:pointer; border-radius:4px;">IMPRIMIR PDF</button>
 </header>
 
-<div class="app">
-  <div class="main">
-    <div class="panel">
-      <div class="meta-row">
-        <input type="text" id="iTitle" class="fi" placeholder="Título" oninput="update()">
-        <input type="text" id="iArtist" class="fi" placeholder="Artista" oninput="update()">
-        <input type="text" id="iKey" class="fi" placeholder="Tom" oninput="update()">
-      </div>
-      <textarea id="cifraIn" placeholder="Cole sua cifra aqui..." oninput="update()"></textarea>
+<div class="main">
+    <div class="editor">
+        <div class="meta">
+            <input type="text" id="title" placeholder="Música" oninput="draw()">
+            <input type="text" id="artist" placeholder="Artista" oninput="draw()">
+            <input type="text" id="key" placeholder="Tom" oninput="draw()">
+        </div>
+        <textarea id="input" placeholder="Intro: G C D C&#10;Verso: G Em C D" oninput="draw()"></textarea>
     </div>
-    <div class="grid-body">
-      <div id="out" class="rb"></div>
+    <div class="preview">
+        <div id="paper" class="rb"></div>
     </div>
-  </div>
 </div>
 
 <script>
-const W=600, H=65;
-const barW = W/4;
+const W = 600, H = 60;
+const barW = W / 4;
 
-function svgLine(x1,y1,x2,y2,sw,col){ return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${col}" stroke-width="${sw}" />`; }
+function draw() {
+    const text = document.getElementById('input').value;
+    const paper = document.getElementById('paper');
+    const songTitle = document.getElementById('title').value || "Sem Título";
+    
+    let html = `<div class="rb-meta"><div class="rb-title">${songTitle}</div>`;
+    html += `<div>${document.getElementById('artist').value}</div>`;
+    html += `<div style="font-size:12px">Tom: ${document.getElementById('key').value}</div></div>`;
 
-function drawMeasureRepeat(cx, cy) {
-  return `
-    <line x1="${cx-15}" y1="${cy+12}" x2="${cx+15}" y2="${cy-12}" stroke="#9a9070" stroke-width="2" />
-    <circle cx="${cx-8}" cy="${cy-7}" r="2.5" fill="#9a9070" />
-    <circle cx="${cx+8}" cy="${cy+7}" r="2.5" fill="#9a9070" />
-  `;
+    const sections = text.split('\n').reduce((acc, line) => {
+        if (line.includes(':')) {
+            acc.push({ label: line.split(':')[0], lines: [] });
+        } else if (line.trim() && acc.length > 0) {
+            acc[acc.length - 1].lines.push(line.trim());
+        } else if (line.trim()) {
+            acc.push({ label: '', lines: [line.trim()] });
+        }
+        return acc;
+    }, []);
+
+    sections.forEach(sec => {
+        html += `<div class="rb-sec">`;
+        sec.lines.forEach((line, idx) => {
+            const chords = line.split(/\s+/).slice(0, 4);
+            while(chords.length < 4) chords.push('%');
+            html += `<div class="rb-system">${renderSVG(chords, idx === 0 ? sec.label : null)}</div>`;
+        });
+        html += `</div>`;
+    });
+    paper.innerHTML = html;
 }
 
-function chordText(chord, cx, cy) {
-  if(!chord) return '';
-  const m = chord.match(/^([A-G][b#]?)(.*)$/);
-  if(!m) return `<text x="${cx}" y="${cy}" font-family="IBM Plex Mono" font-size="22" font-weight="700" text-anchor="middle" dominant-baseline="central">${chord}</text>`;
-  
-  const root = m[1], qual = m[2] || '';
-  // Formatação Jazz: Triângulos e Círculos cortados
-  const displayQual = qual.replace(/maj7/gi,'Δ7').replace(/m7b5/gi,'ø7');
-  
-  return `
-    <text x="${cx}" y="${cy}" font-family="IBM Plex Mono" font-size="24" font-weight="700" text-anchor="middle" dominant-baseline="central">
-      ${root}<tspan dy="-10" font-size="12" font-weight="400">${displayQual}</tspan>
-    </text>
-  `;
+function renderSVG(chords, label) {
+    let svg = `<svg viewBox="0 -25 ${W} ${H+25}" style="display:block; width:100%; overflow:visible;">`;
+    
+    // Pauta
+    svg += `<line x1="0" y1="0" x2="${W}" y2="0" stroke="black" stroke-width="2"/>`;
+    svg += `<line x1="0" y1="${H}" x2="${W}" y2="${H}" stroke="black" stroke-width="2"/>`;
+    
+    // Barras
+    for(let i=0; i<=4; i++) {
+        let sw = (i === 0 || i === 4) ? 2.5 : 1;
+        svg += `<line x1="${i*barW}" y1="0" x2="${i*barW}" y2="${H}" stroke="black" stroke-width="${sw}"/>`;
+    }
+
+    // Seção
+    if (label) {
+        svg += `<rect x="0" y="-22" width="18" height="18" fill="black"/>`;
+        svg += `<text x="9" y="-12" fill="white" font-size="10" font-weight="700" text-anchor="middle" dominant-baseline="central">${label[0].toUpperCase()}</text>`;
+    }
+
+    chords.forEach((chord, i) => {
+        const cx = i * barW + barW / 2;
+        if (chord === '%') {
+            svg += `<line x1="${cx-10}" y1="${H/2+10}" x2="${cx+10}" y2="${H/2-10}" stroke="#888" stroke-width="2"/>`;
+            svg += `<circle cx="${cx-6}" cy="${H/2-6}" r="2" fill="#888"/><circle cx="${cx+6}" cy="${H/2+6}" r="2" fill="#888"/>`;
+        } else {
+            // Split chord root and quality
+            let root = chord[0], qual = chord.slice(1);
+            svg += `<text x="${cx}" y="${H/2}" font-family="IBM Plex Mono" font-weight="700" font-size="22" text-anchor="middle" dominant-baseline="central">${root}<tspan dy="-8" font-size="12" font-weight="400">${qual}</tspan></text>`;
+        }
+    });
+
+    return svg + `</svg>`;
 }
-
-function renderSystem(row, label, isFirst, isLast, isRep) {
-  let svg = `<svg viewBox="0 -25 ${W} ${H+25}" style="overflow:visible; display:block; width:100%">`;
-  const midY = H/2;
-
-  // Linhas da Pauta (Contínuas)
-  svg += svgLine(0, 0, W, 0, 1.8, '#161310');
-  svg += svgLine(0, H, W, H, 1.8, '#161310');
-
-  // Barras de Compasso Internas
-  for(let i=1; i<4; i++) svg += svgLine(i*barW, 0, i*barW, H, 0.8, '#2a2620');
-
-  // Barras Laterais (Início e Fim)
-  if(isRep && isFirst) {
-    svg += `<rect x="0" y="0" width="5" height="${H}" fill="#161310" />`;
-    svg += svgLine(8, 0, 8, H, 1, '#161310');
-    svg += `<circle cx="16" cy="${midY-7}" r="2.5" /> <circle cx="16" cy="${midY+7}" r="2.5" />`;
-  } else {
-    svg += svgLine(0, 0, 0, H, 2.5, '#161310');
-  }
-
-  if(isRep && isLast) {
-    svg += svgLine(W-8, 0, W-8, H, 1, '#161310');
-    svg += `<rect x="${W-5}" y="0" width="5" height="${H}" fill="#161310" />`;
-    svg += `<circle cx="${W-16}" cy="${midY-7}" r="2.5" /> <circle cx="${W-16}" cy="${midY+7}" r="2.5" />`;
-  } else {
-    svg += svgLine(W, 0, W, H, 2.5, '#161310');
-  }
-
-  // Marcas de Seção (A, B, C)
-  if(label) {
-    svg += `
-      <rect x="0" y="-22" width="20" height="20" fill="#161310" />
-      <text x="10" y="-12" fill="#fff" font-family="serif" font-weight="700" font-size="12" text-anchor="middle" dominant-baseline="central">${label}</text>
-    `;
-  }
-
-  // Conteúdo
-  row.forEach((chord, i) => {
-    const cx = i*barW + barW/2;
-    if(!chord || chord === '%') svg += drawMeasureRepeat(cx, midY);
-    else svg += chordText(chord, cx, midY);
-  });
-
-  return svg + `</svg>`;
-}
-
-function update() {
-  const text = document.getElementById('cifraIn').value;
-  const out = document.getElementById('out');
-  const title = document.getElementById('iTitle').value || 'Sem Título';
-  const artist = document.getElementById('iArtist').value || '';
-  const key = document.getElementById('iKey').value || '';
-
-  let html = `<div class="rb-title">${title}</div>`;
-  if(artist) html += `<div class="rb-artist">${artist}</div>`;
-  if(key)
+</script>
+</body>
+</html>
