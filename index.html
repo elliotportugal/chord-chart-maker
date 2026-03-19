@@ -2,125 +2,196 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chord Chart Maker - Pro Version</title>
-<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Chord Chart Maker PRO</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600;700&family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
 <style>
-    :root { --bg: #0f0e0d; --gold: #c8a84b; --paper: #f5f0e4; --ink: #161310; }
-    body { margin: 0; background: var(--bg); color: #e6e2d6; font-family: sans-serif; height: 100vh; display: flex; flex-direction: column; }
-    header { background: #181714; padding: 10px 20px; display: flex; align-items: center; border-bottom: 1px solid #2e2c28; }
-    .main { display: flex; flex: 1; overflow: hidden; }
-    .editor { width: 40%; display: flex; flex-direction: column; border-right: 1px solid #2e2c28; background: #111; }
-    .preview { flex: 1; overflow-y: auto; padding: 40px; background: #201e1a; display: flex; justify-content: center; }
-    
-    textarea { flex: 1; background: transparent; color: #fff; border: none; padding: 20px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; outline: none; resize: none; }
-    .meta { padding: 15px; display: grid; grid-template-columns: 1fr 1fr 60px; gap: 10px; border-bottom: 1px solid #2e2c28; }
-    input { background: #181714; border: 1px solid #3e3c38; color: #fff; padding: 8px; border-radius: 4px; font-size: 12px; }
+:root {
+  --bg:#0f0e0d; --surf:#181714; --surf2:#201f1c; --surf3:#272522;
+  --bd:#2e2c28; --bd2:#3e3c38; --tx:#e6e2d6; --mu:#746e62;
+  --gold:#c8a84b; --pp:#f5f0e4; --ink:#161310;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Lato',sans-serif;color:var(--tx);background:var(--bg);height:100vh;overflow:hidden;display:flex;flex-direction:column;}
 
-    /* Estilo Real Book */
-    .rb { background: var(--paper); color: var(--ink); padding: 50px; width: 100%; max-width: 750px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
-    .rb-title { font-family: 'Libre Baskerville', serif; font-size: 32px; font-weight: 700; margin: 0; }
-    .rb-meta { margin-bottom: 25px; border-bottom: 3px solid var(--ink); padding-bottom: 5px; }
-    .rb-system { margin-top: -1.5px; position: relative; }
-    .rb-sec { margin-bottom: 30px; }
-    
-    @media print {
-        header, .editor { display: none; }
-        .preview { background: #fff; padding: 0; }
-        .rb { box-shadow: none; max-width: 100%; }
-    }
+/* UI STRUCTURE */
+header{background:var(--surf);border-bottom:1px solid var(--bd);height:50px;display:flex;align-items:center;padding:0 16px;gap:10px;flex-shrink:0;}
+.app{display:flex;flex:1;overflow:hidden;}
+.sidebar{background:var(--surf);border-right:1px solid var(--bd);width:190px;transition:width .2s;display:flex;flex-direction:column;}
+.sidebar.collapsed{width:38px;}
+.main{flex:1;display:grid;grid-template-columns:1fr 1fr;overflow:hidden;}
+
+/* PANELS */
+.panel{display:flex;flex-direction:column;border-right:1px solid var(--bd);overflow:hidden;}
+.panel-head{padding:10px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;}
+.meta-row{display:grid;grid-template-columns:1fr 1fr 60px;gap:7px;padding:10px;border-bottom:1px solid var(--bd);}
+.fi{background:var(--surf2);border:1px solid var(--bd2);color:#fff;padding:6px 10px;border-radius:4px;font-size:12px;outline:none;}
+textarea{flex:1;background:var(--surf2);color:#fff;border:none;padding:15px;font-family:'IBM Plex Mono',monospace;font-size:12px;resize:none;outline:none;}
+
+/* TABS */
+.tab-bar{display:flex;border-bottom:1px solid var(--bd);background:var(--surf);}
+.tab{flex:1;padding:12px;border:none;background:none;color:var(--mu);font-size:11px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+
+/* REAL BOOK RENDER ENGINE */
+.grid-body{flex:1;overflow-y:auto;padding:30px;background:#201e1a;}
+.rb{background:var(--pp);padding:40px;width:100%;max-width:700px;margin:0 auto;box-shadow:0 10px 40px rgba(0,0,0,0.5);color:var(--ink);min-height:100%;}
+.rb-title{font-family:'Libre Baskerville',serif;font-size:26px;font-weight:700;margin-bottom:2px;}
+.rb-rule{border:none;border-top:3px solid var(--ink);margin:10px 0 20px;}
+.rb-system-wrap{margin-top:-1.5px; position: relative;}
+.rb-sec-group{margin-bottom:30px;}
+
+.btn{border:none;cursor:pointer;font-size:10px;font-weight:700;border-radius:3px;padding:6px 12px;text-transform:uppercase;transition: 0.2s;}
+.btn-gd{background:var(--gold);color:#111;}
+.btn-gd:hover{filter: brightness(1.1);}
+
+@media print{
+  body *{visibility:hidden;}
+  .grid-body, .rb, .rb *{visibility:visible;}
+  .grid-body{position:absolute;left:0;top:0;width:100%;padding:0;background:white;}
+  .rb{box-shadow:none;max-width:100%;padding:20px;background:white;}
+}
 </style>
 </head>
 <body>
 
 <header>
-    <div style="font-family: 'Libre Baskerville'; color: var(--gold); font-size: 18px;">Chord Chart Maker</div>
-    <button onclick="window.print()" style="margin-left:auto; background:var(--gold); border:none; padding:8px 15px; font-weight:700; cursor:pointer; border-radius:4px;">IMPRIMIR PDF</button>
+  <div style="font-family:'Libre Baskerville';color:var(--gold);font-weight:700;letter-spacing:1px;">CHORD CHART MAKER</div>
+  <button class="btn btn-gd" style="margin-left:auto" onclick="window.print()">Imprimir PDF</button>
 </header>
 
-<div class="main">
-    <div class="editor">
-        <div class="meta">
-            <input type="text" id="title" placeholder="Música" oninput="draw()">
-            <input type="text" id="artist" placeholder="Artista" oninput="draw()">
-            <input type="text" id="key" placeholder="Tom" oninput="draw()">
-        </div>
-        <textarea id="input" placeholder="Intro: G C D C&#10;Verso: G Em C D" oninput="draw()"></textarea>
+<div class="app">
+  <div class="sidebar" id="sidebar">
+    <div style="padding:10px; border-bottom:1px solid var(--bd); font-size:9px; color:var(--mu); letter-spacing:1px;">MÚSICAS</div>
+    <div id="songList" style="flex:1; overflow-y:auto; padding:5px;"></div>
+    <button class="btn" style="background:var(--surf3); color:var(--tx); margin:10px" onclick="newSong()">+ Nova Música</button>
+  </div>
+
+  <div class="main">
+    <div class="panel">
+      <div class="panel-head">STEP 01: CIFRA BRUTA</div>
+      <div class="meta-row">
+        <input type="text" id="iTitle" class="fi" placeholder="Título" oninput="syncMeta()">
+        <input type="text" id="iArtist" class="fi" placeholder="Artista" oninput="syncMeta()">
+        <input type="text" id="iKey" class="fi" placeholder="Tom" oninput="syncMeta()">
+      </div>
+      <textarea id="cifraIn" placeholder="Cole a cifra do Cifra Club aqui..." oninput="onCifraChange()"></textarea>
     </div>
-    <div class="preview">
-        <div id="paper" class="rb"></div>
+
+    <div class="panel">
+      <div class="tab-bar">
+        <button class="tab active" id="tab-cs" onclick="switchTab('cs')">02 COMPASSOS (EDITOR)</button>
+        <button class="tab" id="tab-grid" onclick="switchTab('grid')">03 GRID (PREVIEW)</button>
+      </div>
+      
+      <div id="view-cs" style="display:flex; flex:1; flex-direction:column;">
+        <textarea id="csEdit" style="background:var(--surf3); line-height:1.8;" placeholder="Processando compassos..." oninput="updateGrid()"></textarea>
+      </div>
+
+      <div id="view-grid" style="display:none; flex:1; flex-direction:column;" class="grid-body">
+        <div id="out" class="rb"></div>
+      </div>
     </div>
+  </div>
 </div>
 
 <script>
-const W = 600, H = 60;
-const barW = W / 4;
+let songs = [], aid = null, uid = 1;
+const W = 600, H = 60, barW = W/4;
 
-function draw() {
-    const text = document.getElementById('input').value;
-    const paper = document.getElementById('paper');
-    const songTitle = document.getElementById('title').value || "Sem Título";
-    
-    let html = `<div class="rb-meta"><div class="rb-title">${songTitle}</div>`;
-    html += `<div>${document.getElementById('artist').value}</div>`;
-    html += `<div style="font-size:12px">Tom: ${document.getElementById('key').value}</div></div>`;
-
-    const sections = text.split('\n').reduce((acc, line) => {
-        if (line.includes(':')) {
-            acc.push({ label: line.split(':')[0], lines: [] });
-        } else if (line.trim() && acc.length > 0) {
-            acc[acc.length - 1].lines.push(line.trim());
-        } else if (line.trim()) {
-            acc.push({ label: '', lines: [line.trim()] });
-        }
-        return acc;
-    }, []);
-
-    sections.forEach(sec => {
-        html += `<div class="rb-sec">`;
-        sec.lines.forEach((line, idx) => {
-            const chords = line.split(/\s+/).slice(0, 4);
-            while(chords.length < 4) chords.push('%');
-            html += `<div class="rb-system">${renderSVG(chords, idx === 0 ? sec.label : null)}</div>`;
-        });
-        html += `</div>`;
-    });
-    paper.innerHTML = html;
+function switchTab(t){
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+  document.getElementById('view-cs').style.display = t==='cs'?'flex':'none';
+  document.getElementById('view-grid').style.display = t==='grid'?'flex':'none';
+  if(t==='grid') updateGrid();
 }
 
-function renderSVG(chords, label) {
-    let svg = `<svg viewBox="0 -25 ${W} ${H+25}" style="display:block; width:100%; overflow:visible;">`;
-    
-    // Pauta
-    svg += `<line x1="0" y1="0" x2="${W}" y2="0" stroke="black" stroke-width="2"/>`;
-    svg += `<line x1="0" y1="${H}" x2="${W}" y2="${H}" stroke="black" stroke-width="2"/>`;
-    
-    // Barras
-    for(let i=0; i<=4; i++) {
-        let sw = (i === 0 || i === 4) ? 2.5 : 1;
-        svg += `<line x1="${i*barW}" y1="0" x2="${i*barW}" y2="${H}" stroke="black" stroke-width="${sw}"/>`;
-    }
-
-    // Seção
-    if (label) {
-        svg += `<rect x="0" y="-22" width="18" height="18" fill="black"/>`;
-        svg += `<text x="9" y="-12" fill="white" font-size="10" font-weight="700" text-anchor="middle" dominant-baseline="central">${label[0].toUpperCase()}</text>`;
-    }
-
-    chords.forEach((chord, i) => {
-        const cx = i * barW + barW / 2;
-        if (chord === '%') {
-            svg += `<line x1="${cx-10}" y1="${H/2+10}" x2="${cx+10}" y2="${H/2-10}" stroke="#888" stroke-width="2"/>`;
-            svg += `<circle cx="${cx-6}" cy="${H/2-6}" r="2" fill="#888"/><circle cx="${cx+6}" cy="${H/2+6}" r="2" fill="#888"/>`;
-        } else {
-            // Split chord root and quality
-            let root = chord[0], qual = chord.slice(1);
-            svg += `<text x="${cx}" y="${H/2}" font-family="IBM Plex Mono" font-weight="700" font-size="22" text-anchor="middle" dominant-baseline="central">${root}<tspan dy="-8" font-size="12" font-weight="400">${qual}</tspan></text>`;
-        }
-    });
-
-    return svg + `</svg>`;
+function syncMeta(){
+  updateGrid();
 }
+
+function onCifraChange(){
+  const text = document.getElementById('cifraIn').value;
+  // Extração básica de acordes (ajustável)
+  const chords = text.match(/[A-G][b#]?(maj7|m7b5|ø7|m7|7|Δ7|dim7|m|sus4|add9)?/g) || [];
+  let formatted = "";
+  for(let i=0; i<chords.length; i++){
+    formatted += chords[i] + ( (i+1)%4===0 ? "\n" : " ");
+  }
+  document.getElementById('csEdit').value = formatted;
+  updateGrid();
+}
+
+function renderSystem(row, label, isFirst) {
+  // viewBox ajustado para não cortar a marca de seção
+  let svg = `<svg viewBox="0 -25 ${W} ${H+25}" style="overflow:visible; display:block; width:100%">`;
+  const midY = H/2;
+
+  // Pauta (Linhas horizontais contínuas)
+  svg += `<line x1="0" y1="0" x2="${W}" y2="0" stroke="black" stroke-width="1.8"/>`;
+  svg += `<line x1="0" y1="${H}" x2="${W}" y2="${H}" stroke="black" stroke-width="1.8"/>`;
+  
+  // Barlines rítmicas
+  for(let i=0; i<=4; i++) {
+    let sw = (i===0 || i===4) ? 2.5 : 0.8;
+    svg += `<line x1="${i*barW}" y1="0" x2="${i*barW}" y2="${H}" stroke="black" stroke-width="${sw}"/>`;
+  }
+
+  // Marca de Seção [A]
+  if(label) {
+    svg += `<rect x="0" y="-22" width="20" height="20" fill="black"/>`;
+    svg += `<text x="10" y="-12" fill="white" font-family="serif" font-weight="700" font-size="12" text-anchor="middle" dominant-baseline="central">${label[0].toUpperCase()}</text>`;
+  }
+
+  row.forEach((chord, i) => {
+    const cx = i*barW + barW/2;
+    if(!chord || chord === '%') {
+      // Símbolo de Repetição (%)
+      svg += `<line x1="${cx-12}" y1="${midY+10}" x2="${cx+12}" y2="${midY-10}" stroke="#9a9070" stroke-width="2"/>`;
+      svg += `<circle cx="${cx-7}" cy="${midY-6}" r="2.5" fill="#9a9070"/><circle cx="${cx+7}" cy="${midY+6}" r="2.5" fill="#9a9070"/>`;
+    } else {
+      // Formatação de Acorde (Suprescrito)
+      let root = chord[0], qual = chord.slice(1).replace(/maj7/gi,'Δ7').replace(/m7b5/gi,'ø7');
+      svg += `<text x="${cx}" y="${midY}" font-family="IBM Plex Mono" font-weight="700" font-size="22" text-anchor="middle" dominant-baseline="central">${root}<tspan dy="-10" font-size="12" font-weight="400">${qual}</tspan></text>`;
+    }
+  });
+  return svg + `</svg>`;
+}
+
+function updateGrid() {
+  const title = document.getElementById('iTitle').value || 'Sem Título';
+  const artist = document.getElementById('iArtist').value || '';
+  const key = document.getElementById('iKey').value || '';
+  const text = document.getElementById('csEdit').value;
+
+  let html = `<div class="rb-title">${title}</div><div style="font-style:italic; margin-bottom:5px; opacity:0.7;">${artist}</div>`;
+  if(key) html += `<div style="font-size:10px; color:#555; margin-bottom:15px; font-family:monospace;">Tom: ${key}</div>`;
+  html += `<hr class="rb-rule">`;
+
+  const sections = text.split('\n').filter(l => l.trim());
+  html += `<div class="rb-sec-group">`;
+  sections.forEach((line, idx) => {
+    const chords = line.trim().split(/\s+/);
+    while(chords.length < 4) chords.push('%');
+    // Só coloca marca de seção na primeira linha
+    html += `<div class="rb-system-wrap">${renderSystem(chords, (idx===0?'A':null), idx===0)}</div>`;
+  });
+  html += `</div>`;
+  document.getElementById('out').innerHTML = html;
+}
+
+function newSong(){
+  aid = uid++;
+  document.getElementById('iTitle').value = "";
+  document.getElementById('iArtist').value = "";
+  document.getElementById('iKey').value = "";
+  document.getElementById('cifraIn').value = "";
+  document.getElementById('csEdit').value = "";
+  updateGrid();
+}
+
+newSong();
 </script>
 </body>
 </html>
