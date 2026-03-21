@@ -1,0 +1,113 @@
+/* RESET */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* BASE */
+body {
+  font-family: Arial, sans-serif;
+  background: #0f172a;
+  color: white;
+}
+
+/* HEADER */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 12px 16px;
+  background: #1e293b;
+  border-bottom: 1px solid #334155;
+}
+
+.logo {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.actions button {
+  margin-left: 8px;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 6px;
+  background: #2563eb;
+  color: white;
+  font-size: 14px;
+}
+
+/* LAYOUT */
+.container {
+  display: flex;
+  height: calc(100vh - 60px);
+}
+
+/* EDITOR */
+.editor-panel {
+  width: 50%;
+  border-right: 1px solid #334155;
+}
+
+textarea {
+  width: 100%;
+  height: 100%;
+  padding: 16px;
+
+  background: #020617;
+  color: #e2e8f0;
+
+  border: none;
+  outline: none;
+
+  font-family: monospace;
+  font-size: 16px;
+}
+
+/* PREVIEW */
+.preview-panel {
+  width: 50%;
+  overflow-y: auto;
+  background: white;
+  color: black;
+}
+
+#preview {
+  padding: 20px;
+  max-width: 800px;
+  margin: auto;
+}
+
+/* ESTILO MUSICAL */
+.section {
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 20px;
+}
+
+.line {
+  margin-bottom: 8px;
+}
+
+.chord {
+  font-weight: bold;
+  margin-right: 14px;
+}
+
+/* RESPONSIVO (iPad portrait) */
+@media (max-width: 900px) {
+  .container {
+    flex-direction: column;
+  }
+
+  .editor-panel,
+  .preview-panel {
+    width: 100%;
+    height: 50%;
+  }
+}
