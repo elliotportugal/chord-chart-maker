@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-PT">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,66 +8,64 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root {
-            --bg: #f5f7fa;
+            --bg: #f3f4f6;
             --sidebar-bg: #ffffff;
             --border: #d1d5db;
-            --text-main: #1f2937;
             --accent: #2563eb;
             --paper: #ffffff;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: #1f2937; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        header { background: #fff; height: 60px; display: flex; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--border); justify-content: space-between; z-index: 10; }
-        .logo { font-weight: 800; color: var(--accent); display: flex; align-items: center; gap: 12px; font-size: 16px; }
-        .btn-ui { background: #f3f4f6; border: 1px solid var(--border); padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 700; color: #374151; }
+        header { background: #fff; height: 60px; display: flex; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--border); justify-content: space-between; z-index: 50; }
+        .logo { font-weight: 800; color: var(--accent); font-size: 16px; display: flex; align-items: center; gap: 10px; }
+        .btn-ui { background: #f3f4f6; border: 1px solid var(--border); padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 700; transition: 0.2s; }
+        .btn-ui:hover { background: #e5e7eb; }
 
         .app-container { display: flex; flex: 1; overflow: hidden; }
 
-        /* Sidebar Retrátil */
-        .sidebar { width: 250px; background: var(--sidebar-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; transition: transform 0.3s ease, margin-left 0.3s ease; flex-shrink: 0; }
+        /* Sidebar */
+        .sidebar { width: 250px; background: var(--sidebar-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; transition: margin-left 0.3s ease; flex-shrink: 0; }
         .sidebar.hidden { margin-left: -250px; }
         .sb-list { flex: 1; overflow-y: auto; padding: 10px; }
         .sb-item { padding: 10px 15px; border-radius: 6px; cursor: pointer; font-size: 13px; margin-bottom: 4px; display: flex; justify-content: space-between; border: 1px solid transparent; }
         .sb-item.active { background: #eff6ff; color: var(--accent); border-color: #bfdbfe; font-weight: 600; }
-        .btn-new { margin: 15px; padding: 12px; background: var(--accent); color: #fff; border: none; border-radius: 6px; font-weight: 700; cursor: pointer; }
 
-        /* Workspace Grid */
-        .workspace { flex: 1; display: grid; grid-template-columns: 400px 1fr; overflow: hidden; }
+        /* Workspace */
+        .workspace { flex: 1; display: grid; grid-template-columns: 420px 1fr; overflow: hidden; }
         .editor-panel { background: #fff; border-right: 1px solid var(--border); display: flex; flex-direction: column; }
         .tabs { display: flex; border-bottom: 1px solid var(--border); }
         .tab { flex: 1; padding: 14px; border: none; background: none; font-size: 11px; font-weight: 700; color: #6b7280; cursor: pointer; border-bottom: 2px solid transparent; }
         .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-        .tab-content { flex: 1; display: none; flex-direction: column; padding: 20px; }
+        
+        .tab-content { flex: 1; display: none; flex-direction: column; padding: 20px; gap: 15px; overflow-y: auto; }
         .tab-content.active { display: flex; }
-
-        textarea { flex: 1; width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 15px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; line-height: 1.6; resize: none; outline: none; background: #fafafa; color: #374151; }
-        .meta-grid { display: grid; grid-template-columns: 1fr 1fr 60px; gap: 8px; margin-bottom: 15px; }
+        
+        textarea { flex: 1; width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 15px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; line-height: 1.6; outline: none; background: #fafafa; resize: none; }
+        .meta-grid { display: grid; grid-template-columns: 1fr 1fr 60px; gap: 8px; margin-bottom: 10px; }
         .meta-grid input { padding: 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 13px; outline: none; }
 
-        /* Preview Area - "The Paper" */
-        .preview-area { flex: 1; overflow-y: auto; padding: 40px; background: #e5e7eb; display: flex; flex-direction: column; align-items: center; }
+        /* Preview Paper */
+        .preview-area { flex: 1; overflow-y: auto; padding: 40px; background: #d1d5db; display: flex; flex-direction: column; align-items: center; }
         .paper { 
             background: #fff; 
             width: 210mm; 
             min-height: 297mm; 
-            padding: 2cm; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            padding: 1.5cm 2cm; 
             color: #000; 
             font-family: 'Patrick Hand', cursive;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         }
 
-        /* Títulos Estilo ChordSheet */
-        .p-title { font-size: 32px; font-weight: 800; text-transform: uppercase; margin-bottom: 5px; border-bottom: 2.5px solid #000; padding-bottom: 5px; }
+        .p-title { font-size: 32px; font-weight: 800; text-transform: uppercase; border-bottom: 2.5px solid #000; padding-bottom: 5px; margin-bottom: 5px; }
         .p-artist { font-size: 18px; color: #444; margin-bottom: 25px; }
-        .p-section { font-size: 20px; margin: 30px 0 10px 0; color: #000; border-bottom: 1px solid #eee; }
+        .p-sec-title { font-size: 20px; margin: 30px 0 10px 0; color: #000; }
 
-        /* Estilo da Grade: SEM TABELAS, APENAS PAUTAS */
-        .p-system { margin-top: -1px; break-inside: avoid; }
+        /* Estilo da Grade - PAUTA CONTÍNUA */
+        .section-svg-container { margin-bottom: 20px; }
 
         @media print {
-            body { background: white; }
             header, .sidebar, .editor-panel { display: none !important; }
             .preview-area { padding: 0; background: white; }
             .paper { box-shadow: none; width: 100%; padding: 1cm; }
@@ -77,10 +75,7 @@
 <body>
 
 <header>
-    <div class="logo">
-        <button class="btn-ui" onclick="toggleSB()">☰ MENU</button>
-        CHORD ROADMAP PRO
-    </div>
+    <div class="logo"><button class="btn-ui" onclick="toggleSB()">☰ MENU</button> ROADMAP PRO</div>
     <div style="display:flex; gap:10px">
         <button class="btn-ui" onclick="window.print()">IMPRIMIR</button>
         <button class="btn-ui" style="background:var(--accent); color:#fff; border:none" onclick="exportPDF()">SALVAR PDF</button>
@@ -89,9 +84,8 @@
 
 <div class="app-container">
     <div class="sidebar" id="sidebar">
-        <div class="sb-head" style="padding:15px; font-size:10px; font-weight:800; color:#9ca3af">REPERTÓRIO</div>
+        <button class="btn-ui" style="margin:15px; background:var(--accent); color:#fff; border:none" onclick="newSong()">+ NOVA MÚSICA</button>
         <div id="songList" class="sb-list"></div>
-        <button class="btn-new" onclick="newSong()">+ ADICIONAR MÚSICA</button>
     </div>
 
     <div class="workspace">
@@ -106,10 +100,10 @@
                     <input type="text" id="m-artist" placeholder="Artista" oninput="updateSong()">
                     <input type="text" id="m-key" placeholder="Tom" oninput="updateSong()">
                 </div>
-                <textarea id="raw-in" oninput="processRaw()" placeholder="Cole a cifra do Cifra Club aqui..."></textarea>
+                <textarea id="raw-in" oninput="processRaw()" placeholder="Cole a cifra aqui..."></textarea>
             </div>
             <div id="t-map" class="tab-content">
-                <textarea id="map-in" oninput="updateSong(); render();" placeholder="Edite o roadmap aqui..."></textarea>
+                <textarea id="map-in" oninput="updateSong(); render();" placeholder="Mapa de texto..."></textarea>
             </div>
         </div>
 
@@ -120,9 +114,9 @@
 </div>
 
 <script>
-    let songs = JSON.parse(localStorage.getItem('roadmap_v15')) || [];
+    let songs = JSON.parse(localStorage.getItem('roadmap_v18')) || [];
     let activeId = null;
-    const W = 600, H = 60, bW = W/4;
+    const W = 600, rowH = 60, barW = W/4;
 
     function toggleSB() { document.getElementById('sidebar').classList.toggle('hidden'); }
     function setTab(t, el) {
@@ -148,62 +142,82 @@
         updateSong(); render();
     }
 
-    /* O NOVO MOTOR: DESENHO PURO, ZERO TABELA */
-    function drawSystem(line, isRep) {
-        let svg = `<svg viewBox="0 -10 ${W} ${H+15}" xmlns="http://www.w3.org/2000/svg" style="display:block; width:100%; overflow:visible;">`;
+    /* NOVO MOTOR: DESENHA A SECÇÃO COMPLETA NUM ÚNICO SVG */
+    function drawSectionSVG(rows, isRep) {
+        const totalH = rows.length * rowH;
+        let svg = `<svg width="100%" viewBox="0 -10 ${W} ${totalH + 20}" xmlns="http://www.w3.org/2000/svg" style="display:block; overflow:visible;">`;
         
-        // PAUTA: Apenas duas linhas horizontais (estilo aberto)
-        svg += `<line x1="0" y1="0" x2="${W}" y2="0" stroke="black" stroke-width="1.2"/>`;
-        svg += `<line x1="0" y1="${H}" x2="${W}" y2="${H}" stroke="black" stroke-width="1.2"/>`;
+        // Desenha as LINHAS HORIZONTAIS contínuas da secção
+        for(let i = 0; i <= rows.length; i++) {
+            const y = i * rowH;
+            svg += `<line x1="0" y1="${y}" x2="${W}" y2="${y}" stroke="black" stroke-width="1.2"/>`;
+        }
         
-        // BARLINES: Apenas cortes verticais (sem fechar laterais como caixas)
-        for(let i=0; i<=4; i++) {
-            let sw = (i === 0 || i === 4) ? 2.5 : 0.8;
-            svg += `<line x1="${i*bW}" y1="0" x2="${i*bW}" y2="${H}" stroke="black" stroke-width="${sw}"/>`;
-        }
+        // Desenha as BARLINES verticais para cada linha
+        rows.forEach((row, rIdx) => {
+            const yT = rIdx * rowH;
+            const yB = (rIdx + 1) * rowH;
+            const midY = yT + rowH/2;
 
-        // RITORNELLO: Geometria pura estilo ChordSheet
-        if(isRep) {
-            svg += `<rect x="0" y="0" width="5" height="${H}" fill="black"/>`;
-            svg += `<circle cx="14" cy="${H/2-8}" r="2.8" fill="black"/><circle cx="14" cy="${H/2+8}" r="2.8" fill="black"/>`;
-        }
-
-        const chords = line.trim().split(/\s+/).slice(0, 4);
-        chords.forEach((chord, i) => {
-            const cx = i * bW + bW / 2;
-            if (chord === '%' || !chord) {
-                svg += `<line x1="${cx-10}" y1="${H/2+10}" x2="${cx+10}" y2="${H/2-10}" stroke="#999" stroke-width="1.8"/>`;
-                svg += `<circle cx="${cx-7}" cy="${H/2-7}" r="2.2" fill="#999"/><circle cx="${cx+7}" cy="${H/2+7}" r="2.2" fill="#999"/>`;
-            } else {
-                let m = chord.match(/^([A-G][b#]?)(.*)$/);
-                if(m) {
-                    let q = m[2].replace(/maj7/gi,'Δ7').replace(/m7b5/gi,'ø7');
-                    svg += `<text x="${cx}" y="${H/2+5}" font-family="Patrick Hand" font-size="34" text-anchor="middle" fill="black">${m[1]}<tspan dy="-12" font-size="18">${q}</tspan></text>`;
-                }
+            for(let i = 0; i <= 4; i++) {
+                let sw = (i === 0 || i === 4) ? 2.5 : 0.8;
+                svg += `<line x1="${i*barW}" y1="${yT}" x2="${i*barW}" y2="${yB}" stroke="black" stroke-width="${sw}"/>`;
             }
+
+            // Ritornello na primeira linha da secção (se aplicável)
+            if(isRep && rIdx === 0) {
+                svg += `<rect x="0" y="${yT}" width="5" height="${rowH}" fill="black"/>`;
+                svg += `<circle cx="14" cy="${midY-8}" r="2.8" fill="black"/><circle cx="14" cy="${midY+8}" r="2.8" fill="black"/>`;
+            }
+
+            // Acordes
+            const chords = row.trim().split(/\s+/).slice(0, 4);
+            chords.forEach((chord, cIdx) => {
+                const cx = cIdx * barW + barW / 2;
+                if (chord === '%' || !chord) {
+                    svg += `<line x1="${cx-10}" y1="${midY+10}" x2="${cx+10}" y2="${midY-10}" stroke="#999" stroke-width="1.8"/>`;
+                    svg += `<circle cx="${cx-7}" cy="${midY-7}" r="2.2" fill="#999"/><circle cx="${cx+7}" cy="${midY+7}" r="2.2" fill="#999"/>`;
+                } else {
+                    let m = chord.match(/^([A-G][b#]?)(.*)$/);
+                    if(m) {
+                        let q = m[2].replace(/maj7/gi,'Δ7').replace(/m7b5/gi,'ø7');
+                        svg += `<text x="${cx}" y="${midY+5}" font-family="Patrick Hand" font-size="34" text-anchor="middle" fill="black">${m[1]}<tspan dy="-12" font-size="18">${q}</tspan></text>`;
+                    }
+                }
+            });
         });
+
         return svg + `</svg>`;
     }
 
     function render() {
         const out = document.getElementById('paper');
+        const map = document.getElementById('map-in').value;
         const t = document.getElementById('m-title').value || 'SEM TÍTULO';
         const a = document.getElementById('m-artist').value || 'Artista';
         const k = document.getElementById('m-key').value || '';
-        const map = document.getElementById('map-in').value;
 
         let h = `<div class="p-title">${t}</div><div class="p-artist">${a} ${k ? ' • Tom: '+k : ''}</div>`;
         
-        const lines = map.split('\n').map(l => l.trim()).filter(l => l !== "");
-        lines.forEach((line, idx) => {
+        const content = map.split('\n').map(l => l.trim()).filter(l => l !== "");
+        let currentSec = null;
+        let currentRows = [];
+
+        content.forEach((line, idx) => {
             if (line.startsWith(':')) {
-                h += `<div class="p-section">${line.replace(':', '').trim()}</div>`;
+                if (currentRows.length > 0) {
+                    h += `<div class="section-svg-container">${drawSectionSVG(currentRows, false)}</div>`;
+                    currentRows = [];
+                }
+                h += `<div class="p-sec-title">${line.replace(':', '').trim()}</div>`;
             } else {
-                const isRep = line.includes('(') || line.includes('x');
-                const cleanLine = line.replace(/[()]/g,'').replace(/ x\d+/,'');
-                h += `<div class="p-system">${drawSystem(cleanLine, isRep)}</div>`;
+                currentRows.push(line);
+            }
+            if (idx === content.length - 1 && currentRows.length > 0) {
+                h += `<div class="section-svg-container">${drawSectionSVG(currentRows, false)}</div>`;
             }
         });
+
         out.innerHTML = h;
     }
 
@@ -230,7 +244,7 @@
         s.key = document.getElementById('m-key').value;
         s.raw = document.getElementById('raw-in').value;
         s.map = document.getElementById('map-in').value;
-        localStorage.setItem('roadmap_v15', JSON.stringify(songs));
+        localStorage.setItem('roadmap_v18', JSON.stringify(songs));
         renderList();
     }
 
