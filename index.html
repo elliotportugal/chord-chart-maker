@@ -2,265 +2,160 @@
 <html lang="pt-PT">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chord Roadmap Pro</title>
-    <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Inter:wght@400;600;800&family=IBM+Plex+Mono&display=swap" rel="stylesheet">
+    <title>Chord Roadmap Canvas Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        :root {
-            --bg: #f3f4f6;
-            --sidebar-bg: #ffffff;
-            --border: #d1d5db;
-            --accent: #2563eb;
-            --paper: #ffffff;
-        }
-
+        :root { --bg: #f3f4f6; --accent: #2563eb; --border: #d1d5db; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: #1f2937; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-
-        header { background: #fff; height: 60px; display: flex; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--border); justify-content: space-between; z-index: 50; }
-        .logo { font-weight: 800; color: var(--accent); font-size: 16px; display: flex; align-items: center; gap: 10px; }
-        .btn-ui { background: #f3f4f6; border: 1px solid var(--border); padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 700; transition: 0.2s; }
-        .btn-ui:hover { background: #e5e7eb; }
-
+        body { font-family: 'Inter', sans-serif; background: var(--bg); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        
+        header { background: #fff; height: 60px; display: flex; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--border); justify-content: space-between; }
         .app-container { display: flex; flex: 1; overflow: hidden; }
-
-        /* Sidebar */
-        .sidebar { width: 250px; background: var(--sidebar-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; transition: margin-left 0.3s ease; flex-shrink: 0; }
-        .sidebar.hidden { margin-left: -250px; }
-        .sb-list { flex: 1; overflow-y: auto; padding: 10px; }
-        .sb-item { padding: 10px 15px; border-radius: 6px; cursor: pointer; font-size: 13px; margin-bottom: 4px; display: flex; justify-content: space-between; border: 1px solid transparent; }
-        .sb-item.active { background: #eff6ff; color: var(--accent); border-color: #bfdbfe; font-weight: 600; }
-
-        /* Workspace */
-        .workspace { flex: 1; display: grid; grid-template-columns: 420px 1fr; overflow: hidden; }
-        .editor-panel { background: #fff; border-right: 1px solid var(--border); display: flex; flex-direction: column; }
-        .tabs { display: flex; border-bottom: 1px solid var(--border); }
-        .tab { flex: 1; padding: 14px; border: none; background: none; font-size: 11px; font-weight: 700; color: #6b7280; cursor: pointer; border-bottom: 2px solid transparent; }
-        .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
         
-        .tab-content { flex: 1; display: none; flex-direction: column; padding: 20px; gap: 15px; overflow-y: auto; }
-        .tab-content.active { display: flex; }
+        /* Sidebar e Editor */
+        .sidebar { width: 220px; background: #fff; border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+        .editor { width: 400px; background: #fff; border-right: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        textarea { flex: 1; padding: 15px; font-family: monospace; border: 1px solid var(--border); border-radius: 8px; resize: none; outline: none; background: #fafafa; }
         
-        textarea { flex: 1; width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 15px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; line-height: 1.6; outline: none; background: #fafafa; resize: none; }
-        .meta-grid { display: grid; grid-template-columns: 1fr 1fr 60px; gap: 8px; margin-bottom: 10px; }
-        .meta-grid input { padding: 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 13px; outline: none; }
-
         /* Preview Paper */
-        .preview-area { flex: 1; overflow-y: auto; padding: 40px; background: #d1d5db; display: flex; flex-direction: column; align-items: center; }
-        .paper { 
+        .preview-area { flex: 1; overflow-y: auto; padding: 40px; background: #d1d5db; display: flex; justify-content: center; }
+        #canvas-container { 
             background: #fff; 
-            width: 210mm; 
-            min-height: 297mm; 
-            padding: 1.5cm 2cm; 
-            color: #000; 
-            font-family: 'Patrick Hand', cursive;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+            padding: 2cm;
+            width: 210mm;
+            min-height: 297mm;
         }
+        canvas { display: block; width: 100%; height: auto; }
 
-        .p-title { font-size: 32px; font-weight: 800; text-transform: uppercase; border-bottom: 2.5px solid #000; padding-bottom: 5px; margin-bottom: 5px; }
-        .p-artist { font-size: 18px; color: #444; margin-bottom: 25px; }
-        .p-sec-title { font-size: 20px; margin: 30px 0 10px 0; color: #000; }
-
-        /* Estilo da Grade - PAUTA CONTÍNUA */
-        .section-svg-container { margin-bottom: 20px; }
-
-        @media print {
-            header, .sidebar, .editor-panel { display: none !important; }
-            .preview-area { padding: 0; background: white; }
-            .paper { box-shadow: none; width: 100%; padding: 1cm; }
-        }
+        .btn { padding: 8px 16px; border-radius: 6px; border: 1px solid var(--border); cursor: pointer; font-weight: 700; font-size: 11px; }
+        .btn-primary { background: var(--accent); color: #fff; border: none; }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="logo"><button class="btn-ui" onclick="toggleSB()">☰ MENU</button> ROADMAP PRO</div>
+    <div style="font-weight: 800; color: var(--accent)">CHORD ROADMAP CANVAS</div>
     <div style="display:flex; gap:10px">
-        <button class="btn-ui" onclick="window.print()">IMPRIMIR</button>
-        <button class="btn-ui" style="background:var(--accent); color:#fff; border:none" onclick="exportPDF()">SALVAR PDF</button>
+        <button class="btn" onclick="render()">⚡ ATUALIZAR</button>
+        <button class="btn btn-primary" onclick="exportPDF()">SALVAR PDF</button>
     </div>
 </header>
 
 <div class="app-container">
-    <div class="sidebar" id="sidebar">
-        <button class="btn-ui" style="margin:15px; background:var(--accent); color:#fff; border:none" onclick="newSong()">+ NOVA MÚSICA</button>
-        <div id="songList" class="sb-list"></div>
+    <div class="sidebar">
+        <div id="songList" style="padding:10px"></div>
+    </div>
+    
+    <div class="editor">
+        <input type="text" id="m-title" placeholder="Título da Música" style="padding:10px; border:1px solid var(--border); border-radius:6px">
+        <textarea id="map-in" placeholder=": Intro&#10;G C D C&#10;G Em C D" oninput="render()"></textarea>
     </div>
 
-    <div class="workspace">
-        <div class="editor-panel">
-            <div class="tabs">
-                <button class="tab active" onclick="setTab('raw', this)">01. CIFRA BRUTA</button>
-                <button class="tab" onclick="setTab('map', this)">02. MAPA DE TEXTO</button>
-            </div>
-            <div id="t-raw" class="tab-content active">
-                <div class="meta-grid">
-                    <input type="text" id="m-title" placeholder="Título" oninput="updateSong()">
-                    <input type="text" id="m-artist" placeholder="Artista" oninput="updateSong()">
-                    <input type="text" id="m-key" placeholder="Tom" oninput="updateSong()">
-                </div>
-                <textarea id="raw-in" oninput="processRaw()" placeholder="Cole a cifra aqui..."></textarea>
-            </div>
-            <div id="t-map" class="tab-content">
-                <textarea id="map-in" oninput="updateSong(); render();" placeholder="Mapa de texto..."></textarea>
-            </div>
-        </div>
-
-        <div class="preview-area">
-            <div id="paper" class="paper"></div>
+    <div class="preview-area">
+        <div id="canvas-container">
+            <canvas id="roadmapCanvas"></canvas>
         </div>
     </div>
 </div>
 
 <script>
-    let songs = JSON.parse(localStorage.getItem('roadmap_v18')) || [];
-    let activeId = null;
-    const W = 600, rowH = 60, barW = W/4;
+    const canvas = document.getElementById('roadmapCanvas');
+    const ctx = canvas.getContext('2d');
 
-    function toggleSB() { document.getElementById('sidebar').classList.toggle('hidden'); }
-    function setTab(t, el) {
-        document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        el.classList.add('active');
-        document.getElementById('t-' + t).classList.add('active');
-    }
-
-    function processRaw() {
-        const raw = document.getElementById('raw-in').value;
-        const lines = raw.split('\n');
-        let res = [];
-        lines.forEach(l => {
-            let t = l.trim();
-            if (!t) return;
-            let s = t.match(/\[(.*?)\]/);
-            if (s) { res.push(`: ${s[1]}`); return; }
-            const c = t.match(/\b([A-G][b#]?(maj7|m7b5|ø7|m7|7|Δ7|dim7|m|sus4|add9|9|C9|4|D4)?)\b/g);
-            if (c) res.push(c.join('  '));
-        });
-        document.getElementById('map-in').value = res.join('\n');
-        updateSong(); render();
-    }
-
-    /* NOVO MOTOR: DESENHA A SECÇÃO COMPLETA NUM ÚNICO SVG */
-    function drawSectionSVG(rows, isRep) {
-        const totalH = rows.length * rowH;
-        let svg = `<svg width="100%" viewBox="0 -10 ${W} ${totalH + 20}" xmlns="http://www.w3.org/2000/svg" style="display:block; overflow:visible;">`;
-        
-        // Desenha as LINHAS HORIZONTAIS contínuas da secção
-        for(let i = 0; i <= rows.length; i++) {
-            const y = i * rowH;
-            svg += `<line x1="0" y1="${y}" x2="${W}" y2="${y}" stroke="black" stroke-width="1.2"/>`;
-        }
-        
-        // Desenha as BARLINES verticais para cada linha
-        rows.forEach((row, rIdx) => {
-            const yT = rIdx * rowH;
-            const yB = (rIdx + 1) * rowH;
-            const midY = yT + rowH/2;
-
-            for(let i = 0; i <= 4; i++) {
-                let sw = (i === 0 || i === 4) ? 2.5 : 0.8;
-                svg += `<line x1="${i*barW}" y1="${yT}" x2="${i*barW}" y2="${yB}" stroke="black" stroke-width="${sw}"/>`;
-            }
-
-            // Ritornello na primeira linha da secção (se aplicável)
-            if(isRep && rIdx === 0) {
-                svg += `<rect x="0" y="${yT}" width="5" height="${rowH}" fill="black"/>`;
-                svg += `<circle cx="14" cy="${midY-8}" r="2.8" fill="black"/><circle cx="14" cy="${midY+8}" r="2.8" fill="black"/>`;
-            }
-
-            // Acordes
-            const chords = row.trim().split(/\s+/).slice(0, 4);
-            chords.forEach((chord, cIdx) => {
-                const cx = cIdx * barW + barW / 2;
-                if (chord === '%' || !chord) {
-                    svg += `<line x1="${cx-10}" y1="${midY+10}" x2="${cx+10}" y2="${midY-10}" stroke="#999" stroke-width="1.8"/>`;
-                    svg += `<circle cx="${cx-7}" cy="${midY-7}" r="2.2" fill="#999"/><circle cx="${cx+7}" cy="${midY+7}" r="2.2" fill="#999"/>`;
-                } else {
-                    let m = chord.match(/^([A-G][b#]?)(.*)$/);
-                    if(m) {
-                        let q = m[2].replace(/maj7/gi,'Δ7').replace(/m7b5/gi,'ø7');
-                        svg += `<text x="${cx}" y="${midY+5}" font-family="Patrick Hand" font-size="34" text-anchor="middle" fill="black">${m[1]}<tspan dy="-12" font-size="18">${q}</tspan></text>`;
-                    }
-                }
-            });
-        });
-
-        return svg + `</svg>`;
-    }
+    // Configurações A4 em alta densidade (300DPI aprox)
+    const scale = 2; 
+    const width = 800 * scale;
+    const rowH = 80 * scale;
+    const marginX = 40 * scale;
 
     function render() {
-        const out = document.getElementById('paper');
-        const map = document.getElementById('map-in').value;
-        const t = document.getElementById('m-title').value || 'SEM TÍTULO';
-        const a = document.getElementById('m-artist').value || 'Artista';
-        const k = document.getElementById('m-key').value || '';
-
-        let h = `<div class="p-title">${t}</div><div class="p-artist">${a} ${k ? ' • Tom: '+k : ''}</div>`;
+        const text = document.getElementById('map-in').value;
+        const lines = text.split('\n').map(l => l.trim()).filter(l => l !== "");
         
-        const content = map.split('\n').map(l => l.trim()).filter(l => l !== "");
-        let currentSec = null;
-        let currentRows = [];
+        // Ajustar altura do canvas dinamicamente
+        canvas.width = width;
+        canvas.height = Math.max(1200, (lines.length + 5) * rowH);
+        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        content.forEach((line, idx) => {
+        let currentY = 100 * scale;
+
+        // Título
+        ctx.fillStyle = "black";
+        ctx.font = `bold ${30 * scale}px Libre Baskerville, serif`;
+        ctx.fillText(document.getElementById('m-title').value.toUpperCase() || "SEM TÍTULO", marginX, currentY);
+        currentY += 15 * scale;
+        ctx.lineWidth = 3 * scale;
+        ctx.beginPath(); ctx.moveTo(marginX, currentY); ctx.lineTo(width - marginX, currentY); ctx.stroke();
+        currentY += 50 * scale;
+
+        lines.forEach(line => {
             if (line.startsWith(':')) {
-                if (currentRows.length > 0) {
-                    h += `<div class="section-svg-container">${drawSectionSVG(currentRows, false)}</div>`;
-                    currentRows = [];
-                }
-                h += `<div class="p-sec-title">${line.replace(':', '').trim()}</div>`;
+                // Nome da Secção
+                currentY += 20 * scale;
+                ctx.font = `${18 * scale}px Patrick Hand, cursive`;
+                ctx.fillText(line.replace(':', '').trim(), marginX, currentY);
+                currentY += 15 * scale;
             } else {
-                currentRows.push(line);
-            }
-            if (idx === content.length - 1 && currentRows.length > 0) {
-                h += `<div class="section-svg-container">${drawSectionSVG(currentRows, false)}</div>`;
+                drawSystem(line, currentY);
+                currentY += rowH;
             }
         });
-
-        out.innerHTML = h;
     }
 
-    function newSong() {
-        let s = { id: Date.now(), title: 'Nova Música', artist: '', key: '', raw: '', map: '' };
-        songs.unshift(s); loadSong(s.id);
-    }
+    function drawSystem(line, y) {
+        const barW = (width - 2 * marginX) / 4;
+        
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 1.5 * scale;
 
-    function loadSong(id) {
-        activeId = id; const s = songs.find(x => x.id === id);
-        document.getElementById('m-title').value = s.title;
-        document.getElementById('m-artist').value = s.artist;
-        document.getElementById('m-key').value = s.key;
-        document.getElementById('raw-in').value = s.raw;
-        document.getElementById('map-in').value = s.map;
-        renderList(); render();
-    }
+        // LINHAS DA PAUTA (Contínuas)
+        ctx.beginPath();
+        ctx.moveTo(marginX, y); ctx.lineTo(width - marginX, y); // Cima
+        ctx.moveTo(marginX, y + rowH); ctx.lineTo(width - marginX, y + rowH); // Baixo
+        ctx.stroke();
 
-    function updateSong() {
-        if (!activeId) return;
-        const s = songs.find(x => x.id === activeId);
-        s.title = document.getElementById('m-title').value;
-        s.artist = document.getElementById('m-artist').value;
-        s.key = document.getElementById('m-key').value;
-        s.raw = document.getElementById('raw-in').value;
-        s.map = document.getElementById('map-in').value;
-        localStorage.setItem('roadmap_v18', JSON.stringify(songs));
-        renderList();
-    }
+        // BARLINES
+        for (let i = 0; i <= 4; i++) {
+            ctx.lineWidth = (i === 0 || i === 4) ? 3 * scale : 1 * scale;
+            ctx.beginPath();
+            ctx.moveTo(marginX + i * barW, y);
+            ctx.lineTo(marginX + i * barW, y + rowH);
+            ctx.stroke();
+        }
 
-    function renderList() {
-        document.getElementById('songList').innerHTML = songs.map(s => `
-            <div class="sb-item ${s.id===activeId?'active':''}" onclick="loadSong(${s.id})">
-                ${s.title || 'Música'}
-            </div>`).join('');
+        // ACORDES
+        const chords = line.split(/\s+/).slice(0, 4);
+        ctx.font = `${32 * scale}px Patrick Hand, cursive`;
+        ctx.textAlign = "center";
+        
+        chords.forEach((chord, i) => {
+            const cx = marginX + i * barW + barW / 2;
+            const midY = y + rowH / 2 + 8 * scale;
+            
+            if (chord === '%') {
+                ctx.strokeStyle = "#999";
+                ctx.beginPath(); ctx.moveTo(cx - 10*scale, midY + 10*scale); ctx.lineTo(cx + 10*scale, midY - 10*scale); ctx.stroke();
+                ctx.fillStyle = "#999";
+                ctx.beginPath(); ctx.arc(cx - 6*scale, midY - 6*scale, 2*scale, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.arc(cx + 6*scale, midY + 6*scale, 2*scale, 0, Math.PI*2); ctx.fill();
+            } else {
+                ctx.fillStyle = "black";
+                ctx.fillText(chord, cx, midY);
+            }
+        });
     }
 
     function exportPDF() {
-        const opt = { margin: 0, filename: 'roadmap.pdf', html2canvas: { scale: 3 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
-        html2pdf().set(opt).from(document.getElementById('paper')).save();
+        const element = document.getElementById('canvas-container');
+        html2pdf().from(element).save();
     }
 
-    if(songs.length > 0) loadSong(songs[0].id); else newSong();
+    render();
 </script>
 </body>
 </html>
