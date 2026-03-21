@@ -112,7 +112,8 @@ textarea {
   }
 }
 
-/* PDF MODE */
+/* ===== PDF MODE ===== */
+
 .pdf-mode {
   position: absolute;
   left: -9999px;
@@ -126,9 +127,32 @@ textarea {
 
   font-family: Helvetica, Arial, sans-serif;
   font-size: 11pt;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
-/* SEÇÕES */
-.pdf-mode
+/* SEÇÕES (Intro, Refrão etc) */
+.pdf-section {
+  font-size: 14pt;
+  font-weight: bold;
+  margin-top: 16pt;
+  margin-bottom: 6pt;
+}
 
+/* LINHAS DE ACORDES */
+.pdf-line {
+  margin-bottom: 6pt;
+  white-space: nowrap;
+}
+
+/* ACORDES */
+.pdf-chord {
+  display: inline-block;
+  min-width: 32px;   /* 🔥 alinhamento consistente */
+  font-weight: bold;
+}
+
+/* QUEBRA DE PÁGINA INTELIGENTE */
+.pdf-section,
+.pdf-line {
+  page-break-inside: avoid;
+}
