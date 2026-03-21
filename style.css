@@ -111,3 +111,24 @@ textarea {
     height: 50%;
   }
 }
+
+/* PDF MODE */
+.pdf-mode {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+
+  width: 210mm;
+  background: white;
+  color: black;
+
+  padding: 20mm;
+
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 11pt;
+  line-height: 1.5;
+}
+
+/* SEÇÕES */
+.pdf-mode
+
