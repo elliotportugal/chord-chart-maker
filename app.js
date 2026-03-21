@@ -54,14 +54,60 @@ function render() {
 
 /* PDF */
 function generatePDF() {
+  const element = renderPDFLayout();
+
   const opt = {
-    margin: 10,
+    margin: 0,
     filename: "cifra.pdf",
-    html2canvas: { scale: 2 },
-    jsPDF: { unit: "mm", format: "a4" }
+    html2canvas: {
+      scale: 3,          // 🔥 melhora MUITO a qualidade
+      useCORS: true
+    },
+    jsPDF: {
+      unit: "mm",
+      format: "a4",
+      orientation: "portrait"
+    }
   };
 
-  html2pdf().set(opt).from(preview).save();
+  html2pdf().set(opt).from(element).save();
+}
+
+/*Render PDF Layout0*/
+function renderPDFLayout() {
+  const container = document.getElementById("pdf-container");
+  container.innerHTML = "";
+
+  const text = cleanText(editor.value);
+  const lines = text.split("\n");
+
+  lines.forEach(line => {
+
+    if (line.startsWith(":")) {
+      const el = document.createElement("div");
+      el.className = "pdf-section";
+      el.textContent = line.replace(":", "").trim();
+      container.appendChild(el);
+
+    } else {
+      const el = document.createElement("div");
+      el.className = "pdf-line";
+
+      line.split(" ").forEach(chord => {
+        if (chord.trim() !== "") {
+          const span = document.createElement("span");
+          span.className = "pdf-chord";
+          span.textContent = chord;
+          el.appendChild(span);
+        }
+      });
+
+      container.appendChild(el);
+    }
+
+  });
+
+  return container;
 }
 
 /* IMPORT */
