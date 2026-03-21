@@ -3,87 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roadmap Maker Modern</title>
+    <title>Chord Roadmap Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Inter:wght@400;600;800&family=IBM+Plex+Mono&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root {
-            --bg: #f4f7f9;
+            --bg: #f5f7fa;
             --sidebar-bg: #ffffff;
-            --border: #e2e8f0;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --accent: #3b82f6;
-            --accent-soft: #eff6ff;
-            --white: #ffffff;
+            --border: #d1d5db;
+            --text-main: #1f2937;
+            --accent: #2563eb;
+            --paper: #ffffff;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        /* Header */
-        header { background: var(--white); height: 60px; display: flex; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--border); justify-content: space-between; z-index: 100; }
-        .logo { font-weight: 800; font-size: 16px; color: var(--accent); display: flex; align-items: center; gap: 12px; }
-        .btn-toggle-sidebar { background: var(--accent-soft); border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; color: var(--accent); font-size: 11px; font-weight: 700; }
+        header { background: #fff; height: 60px; display: flex; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--border); justify-content: space-between; z-index: 10; }
+        .logo { font-weight: 800; color: var(--accent); display: flex; align-items: center; gap: 12px; font-size: 16px; }
+        .btn-ui { background: #f3f4f6; border: 1px solid var(--border); padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 700; color: #374151; }
 
-        /* Layout */
         .app-container { display: flex; flex: 1; overflow: hidden; }
 
-        /* Sidebar */
-        .sidebar { width: 260px; background: var(--sidebar-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; transition: margin 0.3s ease; flex-shrink: 0; }
-        .sidebar.hidden { margin-left: -260px; }
-        .sidebar-header { padding: 20px; font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
-        #songList { flex: 1; overflow-y: auto; padding: 0 10px; }
-        .song-item { padding: 12px 15px; margin-bottom: 4px; border-radius: 8px; cursor: pointer; font-size: 13px; transition: 0.2s; display: flex; justify-content: space-between; align-items: center; border: 1px solid transparent; }
-        .song-item:hover { background: var(--bg); }
-        .song-item.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; border-color: rgba(59, 130, 246, 0.2); }
-        .btn-add { margin: 20px; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 12px; }
+        /* Sidebar Retrátil */
+        .sidebar { width: 250px; background: var(--sidebar-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; transition: transform 0.3s ease, margin-left 0.3s ease; flex-shrink: 0; }
+        .sidebar.hidden { margin-left: -250px; }
+        .sb-list { flex: 1; overflow-y: auto; padding: 10px; }
+        .sb-item { padding: 10px 15px; border-radius: 6px; cursor: pointer; font-size: 13px; margin-bottom: 4px; display: flex; justify-content: space-between; border: 1px solid transparent; }
+        .sb-item.active { background: #eff6ff; color: var(--accent); border-color: #bfdbfe; font-weight: 600; }
+        .btn-new { margin: 15px; padding: 12px; background: var(--accent); color: #fff; border: none; border-radius: 6px; font-weight: 700; cursor: pointer; }
 
-        /* Workspace */
-        .workspace { flex: 1; display: grid; grid-template-columns: 420px 1fr; overflow: hidden; }
-        
-        /* Editor */
-        .editor-panel { background: var(--white); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
-        .tabs { display: flex; border-bottom: 1px solid var(--border); background: #fff; }
-        .tab-btn { flex: 1; padding: 15px; border: none; background: none; font-size: 11px; font-weight: 700; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: 0.2s; }
-        .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+        /* Workspace Grid */
+        .workspace { flex: 1; display: grid; grid-template-columns: 400px 1fr; overflow: hidden; }
+        .editor-panel { background: #fff; border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+        .tabs { display: flex; border-bottom: 1px solid var(--border); }
+        .tab { flex: 1; padding: 14px; border: none; background: none; font-size: 11px; font-weight: 700; color: #6b7280; cursor: pointer; border-bottom: 2px solid transparent; }
+        .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
         .tab-content { flex: 1; display: none; flex-direction: column; padding: 20px; }
         .tab-content.active { display: flex; }
 
-        .input-group { margin-bottom: 15px; }
-        label { display: block; font-size: 10px; font-weight: 800; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; }
-        input[type="text"] { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; outline: none; transition: border 0.2s; }
-        input[type="text"]:focus { border-color: var(--accent); }
-        textarea { flex: 1; width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 15px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; line-height: 1.6; resize: none; outline: none; background: #fafafa; }
+        textarea { flex: 1; width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 15px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; line-height: 1.6; resize: none; outline: none; background: #fafafa; color: #374151; }
+        .meta-grid { display: grid; grid-template-columns: 1fr 1fr 60px; gap: 8px; margin-bottom: 15px; }
+        .meta-grid input { padding: 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 13px; outline: none; }
 
-        /* Preview A4 */
-        .preview-panel { flex: 1; overflow-y: auto; padding: 40px; background: #e2e8f0; display: flex; flex-direction: column; align-items: center; scroll-behavior: smooth; }
-        .rb-page { 
-            background: white; 
+        /* Preview Area - "The Paper" */
+        .preview-area { flex: 1; overflow-y: auto; padding: 40px; background: #e5e7eb; display: flex; flex-direction: column; align-items: center; }
+        .paper { 
+            background: #fff; 
             width: 210mm; 
             min-height: 297mm; 
-            padding: 1.5cm 2cm; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            color: #000;
+            padding: 2cm; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            color: #000; 
             font-family: 'Patrick Hand', cursive;
-            position: relative;
         }
 
-        /* SVG Rendering - Estilo Pauta Aberta */
-        .rb-system-wrap { margin-top: -1px; break-inside: avoid; }
-        .rb-sec-label { font-size: 18px; font-weight: 400; margin: 25px 0 8px 0; color: #000; font-family: 'Patrick Hand', cursive; }
-        .rb-title-block { text-align: left; margin-bottom: 25px; border-bottom: 2.5px solid #000; padding-bottom: 10px; }
-        .rb-h1 { font-size: 30px; font-weight: 700; text-transform: uppercase; line-height: 1; }
-        .rb-h2 { font-size: 16px; font-weight: 400; color: #444; margin-top: 4px; }
+        /* Títulos Estilo ChordSheet */
+        .p-title { font-size: 32px; font-weight: 800; text-transform: uppercase; margin-bottom: 5px; border-bottom: 2.5px solid #000; padding-bottom: 5px; }
+        .p-artist { font-size: 18px; color: #444; margin-bottom: 25px; }
+        .p-section { font-size: 20px; margin: 30px 0 10px 0; color: #000; border-bottom: 1px solid #eee; }
 
-        .btn-action { padding: 9px 16px; border-radius: 6px; border: 1px solid var(--border); background: white; cursor: pointer; font-weight: 700; font-size: 11px; color: var(--text-main); }
-        .btn-primary { background: var(--accent); color: white; border: none; }
+        /* Estilo da Grade: SEM TABELAS, APENAS PAUTAS */
+        .p-system { margin-top: -1px; break-inside: avoid; }
 
         @media print {
-            .sidebar, header, .editor-panel { display: none !important; }
-            .workspace { display: block; }
-            .preview-panel { padding: 0; background: white; }
-            .rb-page { box-shadow: none; width: 100%; padding: 1cm; }
+            body { background: white; }
+            header, .sidebar, .editor-panel { display: none !important; }
+            .preview-area { padding: 0; background: white; }
+            .paper { box-shadow: none; width: 100%; padding: 1cm; }
         }
     </style>
 </head>
@@ -91,198 +78,175 @@
 
 <header>
     <div class="logo">
-        <button class="btn-toggle-sidebar" onclick="toggleSidebar()">☰ MENU</button>
+        <button class="btn-ui" onclick="toggleSB()">☰ MENU</button>
         CHORD ROADMAP PRO
     </div>
     <div style="display:flex; gap:10px">
-        <button class="btn-action" onclick="window.print()">IMPRIMIR</button>
-        <button class="btn-action btn-primary" onclick="exportPDF()">EXPORTAR PDF</button>
+        <button class="btn-ui" onclick="window.print()">IMPRIMIR</button>
+        <button class="btn-ui" style="background:var(--accent); color:#fff; border:none" onclick="exportPDF()">SALVAR PDF</button>
     </div>
 </header>
 
 <div class="app-container">
     <div class="sidebar" id="sidebar">
-        <div class="sidebar-header">Setlist / Repertório</div>
-        <div id="songList"></div>
-        <button class="btn-add" onclick="createNewSong()">+ ADICIONAR MÚSICA</button>
+        <div class="sb-head" style="padding:15px; font-size:10px; font-weight:800; color:#9ca3af">REPERTÓRIO</div>
+        <div id="songList" class="sb-list"></div>
+        <button class="btn-new" onclick="newSong()">+ ADICIONAR MÚSICA</button>
     </div>
 
     <div class="workspace">
         <div class="editor-panel">
             <div class="tabs">
-                <button class="tab-btn active" onclick="switchTab('raw', this)">01. CIFRA BRUTA</button>
-                <button class="tab-btn" onclick="switchTab('map', this)">02. MAPA DE TEXTO</button>
+                <button class="tab active" onclick="setTab('raw', this)">01. CIFRA BRUTA</button>
+                <button class="tab" onclick="setTab('map', this)">02. MAPA DE TEXTO</button>
             </div>
-
-            <div id="tab-raw" class="tab-content active">
-                <div class="input-group">
-                    <label>Identificação</label>
-                    <div style="display:grid; grid-template-columns: 1fr 1fr 60px; gap:8px">
-                        <input type="text" id="iTitle" placeholder="Título" oninput="save()">
-                        <input type="text" id="iArtist" placeholder="Artista" oninput="save()">
-                        <input type="text" id="iKey" placeholder="Tom" oninput="save()">
-                    </div>
+            <div id="t-raw" class="tab-content active">
+                <div class="meta-grid">
+                    <input type="text" id="m-title" placeholder="Título" oninput="updateSong()">
+                    <input type="text" id="m-artist" placeholder="Artista" oninput="updateSong()">
+                    <input type="text" id="m-key" placeholder="Tom" oninput="updateSong()">
                 </div>
-                <label>Conteúdo da Cifra</label>
-                <textarea id="cifraBruta" oninput="autoClean()" placeholder="Cole aqui a cifra original..."></textarea>
+                <textarea id="raw-in" oninput="processRaw()" placeholder="Cole a cifra do Cifra Club aqui..."></textarea>
             </div>
-
-            <div id="tab-map" class="tab-content">
-                <label>Roteiro Musical (Compassos)</label>
-                <textarea id="csEdit" oninput="save(); update();" placeholder=": Intro&#10;G C D G"></textarea>
+            <div id="t-map" class="tab-content">
+                <textarea id="map-in" oninput="updateSong(); render();" placeholder="Edite o roadmap aqui..."></textarea>
             </div>
         </div>
 
-        <div class="preview-panel">
-            <div id="out" class="rb-page">
-                </div>
+        <div class="preview-area">
+            <div id="paper" class="paper"></div>
         </div>
     </div>
 </div>
 
 <script>
-    let songs = JSON.parse(localStorage.getItem('roadmap_ultra_v1')) || [];
-    let currentId = null;
-    const W = 600, H = 60, barW = W/4;
+    let songs = JSON.parse(localStorage.getItem('roadmap_v15')) || [];
+    let activeId = null;
+    const W = 600, H = 60, bW = W/4;
 
-    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('hidden'); }
-
-    function switchTab(tab, btn) {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    function toggleSB() { document.getElementById('sidebar').classList.toggle('hidden'); }
+    function setTab(t, el) {
+        document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById('tab-' + tab).classList.add('active');
+        el.classList.add('active');
+        document.getElementById('t-' + t).classList.add('active');
     }
 
-    function autoClean() {
-        const raw = document.getElementById('cifraBruta').value;
+    function processRaw() {
+        const raw = document.getElementById('raw-in').value;
         const lines = raw.split('\n');
-        let map = [];
+        let res = [];
         lines.forEach(l => {
             let t = l.trim();
             if (!t) return;
-            let sec = t.match(/\[(.*?)\]/);
-            if (sec) { map.push(`: ${sec[1]}`); return; }
-            const chords = t.match(/\b([A-G][b#]?(maj7|m7b5|ø7|m7|7|Δ7|dim7|m|sus4|add9|9|C9|4|D4)?)\b/g);
-            if (chords) map.push(chords.join('  '));
+            let s = t.match(/\[(.*?)\]/);
+            if (s) { res.push(`: ${s[1]}`); return; }
+            const c = t.match(/\b([A-G][b#]?(maj7|m7b5|ø7|m7|7|Δ7|dim7|m|sus4|add9|9|C9|4|D4)?)\b/g);
+            if (c) res.push(c.join('  '));
         });
-        document.getElementById('csEdit').value = map.join('\n');
-        save(); update();
+        document.getElementById('map-in').value = res.join('\n');
+        updateSong(); render();
     }
 
-    /* MOTOR DE RENDERIZAÇÃO VETORIAL (ESTILO CHORDSHEET) */
-    function renderSystemSVG(line, isRep) {
-        let svg = `<svg viewBox="0 -15 ${W} ${H+15}" xmlns="http://www.w3.org/2000/svg" style="display:block; width:100%; overflow:visible;">`;
-        const midY = H/2;
+    /* O NOVO MOTOR: DESENHO PURO, ZERO TABELA */
+    function drawSystem(line, isRep) {
+        let svg = `<svg viewBox="0 -10 ${W} ${H+15}" xmlns="http://www.w3.org/2000/svg" style="display:block; width:100%; overflow:visible;">`;
         
-        // PAUTA ABERTA: Apenas linhas horizontais infinitas (sem fechar laterais)
-        svg += `<line x1="0" y1="0" x2="${W}" y2="0" stroke="black" stroke-width="1.5"/>`;
-        svg += `<line x1="0" y1="${H}" x2="${W}" y2="${H}" stroke="black" stroke-width="1.5"/>`;
+        // PAUTA: Apenas duas linhas horizontais (estilo aberto)
+        svg += `<line x1="0" y1="0" x2="${W}" y2="0" stroke="black" stroke-width="1.2"/>`;
+        svg += `<line x1="0" y1="${H}" x2="${W}" y2="${H}" stroke="black" stroke-width="1.2"/>`;
         
-        // BARLINES: Apenas cortes verticais
+        // BARLINES: Apenas cortes verticais (sem fechar laterais como caixas)
         for(let i=0; i<=4; i++) {
-            let sw = (i === 0 || i === 4) ? 2.5 : 1;
-            svg += `<line x1="${i*barW}" y1="0" x2="${i*barW}" y2="${H}" stroke="black" stroke-width="${sw}"/>`;
+            let sw = (i === 0 || i === 4) ? 2.5 : 0.8;
+            svg += `<line x1="${i*bW}" y1="0" x2="${i*bW}" y2="${H}" stroke="black" stroke-width="${sw}"/>`;
         }
 
-        // RITORNELLO: Geometria pura
+        // RITORNELLO: Geometria pura estilo ChordSheet
         if(isRep) {
             svg += `<rect x="0" y="0" width="5" height="${H}" fill="black"/>`;
-            svg += `<circle cx="14" cy="${midY-8}" r="2.8" fill="black"/><circle cx="14" cy="${midY+8}" r="2.8" fill="black"/>`;
+            svg += `<circle cx="14" cy="${H/2-8}" r="2.8" fill="black"/><circle cx="14" cy="${H/2+8}" r="2.8" fill="black"/>`;
         }
 
         const chords = line.trim().split(/\s+/).slice(0, 4);
         chords.forEach((chord, i) => {
-            const cx = i * barW + barW / 2;
+            const cx = i * bW + bW / 2;
             if (chord === '%' || !chord) {
-                // Símbolo de repetição vetorial
-                svg += `<line x1="${cx-10}" y1="${midY+10}" x2="${cx+10}" y2="${midY-10}" stroke="#999" stroke-width="2"/>`;
-                svg += `<circle cx="${cx-7}" cy="${midY-7}" r="2.2" fill="#999"/><circle cx="${cx+7}" cy="${midY+7}" r="2.2" fill="#999"/>`;
+                svg += `<line x1="${cx-10}" y1="${H/2+10}" x2="${cx+10}" y2="${H/2-10}" stroke="#999" stroke-width="1.8"/>`;
+                svg += `<circle cx="${cx-7}" cy="${H/2-7}" r="2.2" fill="#999"/><circle cx="${cx+7}" cy="${H/2+7}" r="2.2" fill="#999"/>`;
             } else {
                 let m = chord.match(/^([A-G][b#]?)(.*)$/);
                 if(m) {
                     let q = m[2].replace(/maj7/gi,'Δ7').replace(/m7b5/gi,'ø7');
-                    svg += `<text x="${cx}" y="${midY+5}" font-family="Patrick Hand" font-size="34" text-anchor="middle" fill="black">${m[1]}<tspan dy="-12" font-size="18">${q}</tspan></text>`;
+                    svg += `<text x="${cx}" y="${H/2+5}" font-family="Patrick Hand" font-size="34" text-anchor="middle" fill="black">${m[1]}<tspan dy="-12" font-size="18">${q}</tspan></text>`;
                 }
             }
         });
         return svg + `</svg>`;
     }
 
-    function update() {
-        const out = document.getElementById('out');
-        const title = document.getElementById('iTitle').value || 'SEM TÍTULO';
-        const artist = document.getElementById('iArtist').value || 'Artista Desconhecido';
-        const key = document.getElementById('iKey').value || '';
-        const text = document.getElementById('csEdit').value;
+    function render() {
+        const out = document.getElementById('paper');
+        const t = document.getElementById('m-title').value || 'SEM TÍTULO';
+        const a = document.getElementById('m-artist').value || 'Artista';
+        const k = document.getElementById('m-key').value || '';
+        const map = document.getElementById('map-in').value;
 
-        let html = `<div class="rb-title-block">
-                        <div class="rb-h1">${title}</div>
-                        <div class="rb-h2">${artist} ${key ? '• Tom: '+key : ''}</div>
-                    </div>`;
-
-        const lines = text.split('\n').map(l => l.trim()).filter(l => l !== "");
-        let grid = "";
-
+        let h = `<div class="p-title">${t}</div><div class="p-artist">${a} ${k ? ' • Tom: '+k : ''}</div>`;
+        
+        const lines = map.split('\n').map(l => l.trim()).filter(l => l !== "");
         lines.forEach((line, idx) => {
             if (line.startsWith(':')) {
-                grid += `<div class="rb-sec-label">${line.replace(':', '').trim()}</div>`;
+                h += `<div class="p-section">${line.replace(':', '').trim()}</div>`;
             } else {
                 const isRep = line.includes('(') || line.includes('x');
                 const cleanLine = line.replace(/[()]/g,'').replace(/ x\d+/,'');
-                grid += `<div class="rb-system-wrap">${renderSystemSVG(cleanLine, isRep)}</div>`;
+                h += `<div class="p-system">${drawSystem(cleanLine, isRep)}</div>`;
             }
         });
-        out.innerHTML = html + grid;
+        out.innerHTML = h;
     }
 
-    function createNewSong() {
-        let s = { id: Date.now(), title: 'Nova Música', artist: '', key: '', raw: '', clean: '' };
+    function newSong() {
+        let s = { id: Date.now(), title: 'Nova Música', artist: '', key: '', raw: '', map: '' };
         songs.unshift(s); loadSong(s.id);
     }
 
     function loadSong(id) {
-        currentId = id; const s = songs.find(x => x.id === id);
-        if (!s) return;
-        document.getElementById('iTitle').value = s.title || '';
-        document.getElementById('iArtist').value = s.artist || '';
-        document.getElementById('iKey').value = s.key || '';
-        document.getElementById('cifraBruta').value = s.raw || '';
-        document.getElementById('csEdit').value = s.clean || '';
-        renderSongs(); update();
+        activeId = id; const s = songs.find(x => x.id === id);
+        document.getElementById('m-title').value = s.title;
+        document.getElementById('m-artist').value = s.artist;
+        document.getElementById('m-key').value = s.key;
+        document.getElementById('raw-in').value = s.raw;
+        document.getElementById('map-in').value = s.map;
+        renderList(); render();
     }
 
-    function save() {
-        if (!currentId) return; const s = songs.find(x => x.id === currentId);
-        s.title = document.getElementById('iTitle').value;
-        s.artist = document.getElementById('iArtist').value;
-        s.key = document.getElementById('iKey').value;
-        s.raw = document.getElementById('cifraBruta').value;
-        s.clean = document.getElementById('csEdit').value;
-        localStorage.setItem('roadmap_ultra_v1', JSON.stringify(songs));
-        renderSongs();
+    function updateSong() {
+        if (!activeId) return;
+        const s = songs.find(x => x.id === activeId);
+        s.title = document.getElementById('m-title').value;
+        s.artist = document.getElementById('m-artist').value;
+        s.key = document.getElementById('m-key').value;
+        s.raw = document.getElementById('raw-in').value;
+        s.map = document.getElementById('map-in').value;
+        localStorage.setItem('roadmap_v15', JSON.stringify(songs));
+        renderList();
     }
 
-    function renderSongs() {
+    function renderList() {
         document.getElementById('songList').innerHTML = songs.map(s => `
-            <div class="song-item ${s.id===currentId?'active':''}" onclick="loadSong(${s.id})">
-                ${s.title || 'Sem título'}
-                <span style="font-size: 10px; opacity: 0.5">✕</span>
+            <div class="sb-item ${s.id===activeId?'active':''}" onclick="loadSong(${s.id})">
+                ${s.title || 'Música'}
             </div>`).join('');
     }
 
     function exportPDF() {
-        const element = document.getElementById('out');
-        const opt = { 
-            margin: 0, 
-            filename: (document.getElementById('iTitle').value || 'roadmap') + '.pdf', 
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
-        };
-        html2pdf().set(opt).from(element).save();
+        const opt = { margin: 0, filename: 'roadmap.pdf', html2canvas: { scale: 3 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
+        html2pdf().set(opt).from(document.getElementById('paper')).save();
     }
 
-    if(songs.length > 0) loadSong(songs[0].id); else createNewSong();
+    if(songs.length > 0) loadSong(songs[0].id); else newSong();
 </script>
 </body>
 </html>
