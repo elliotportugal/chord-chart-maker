@@ -1,667 +1,228 @@
 <!DOCTYPE html>
-
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Roadmap Maker PRO</title>
-<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;700&family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Libre+Baskerville:wght@700&family=IBM+Plex+Mono:wght@400;700&family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:#0f0e0d; --surf:#181714; --bd:#2e2c28; --bd2:#3e3c38;
-  --tx:#e6e2d6; --mu:#746e62; --gold:#c8a84b;
-  --ink:#000; --ink2:#333; --ink3:#666;
-  --bar:#aaa;
+  --bg:#0f0e0d; --surf:#181714; --bd:#2e2c28; --tx:#e6e2d6; --mu:#746e62; --gold:#c8a84b;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;overflow:hidden;}
-body{font-family:'Lato',sans-serif;background:var(--bg);color:var(--tx);display:flex;flex-direction:column;}
+body{font-family:'Lato',sans-serif;background:var(--bg);color:var(--tx);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
 
-/* ── HEADER ── */
-header{background:var(–surf);height:50px;display:flex;align-items:center;padding:0 20px;border-bottom:1px solid var(–bd);gap:12px;flex-shrink:0;}
-.logo{font-family:‘Libre Baskerville’,serif;color:var(–gold);font-weight:700;font-size:15px;}
+/* UI UI UI */
+header{background:var(--surf);height:50px;display:flex;align-items:center;padding:0 20px;border-bottom:1px solid var(--bd);justify-content:space-between;flex-shrink:0;}
+.app{display:flex;flex:1;overflow:hidden;}
+.sidebar{width:220px;background:var(--surf);border-right:1px solid var(--bd);display:flex;flex-direction:column;}
+.main{flex:1;display:grid;grid-template-columns:1fr 1.3fr;overflow:hidden;}
+.panel{display:flex;flex-direction:column;border-right:1px solid var(--bd);overflow:hidden;}
+.panel-head{padding:8px 14px;background:var(--surf);border-bottom:1px solid var(--bd);font-size:10px;font-weight:900;color:var(--gold);display:flex;justify-content:space-between;align-items:center;}
+.meta-row{display:grid;grid-template-columns:1fr 1fr 60px;gap:8px;padding:10px;border-bottom:1px solid var(--bd);}
+input{background:#111;border:1px solid #3e3c38;color:#fff;padding:6px;border-radius:4px;font-size:12px;outline:none;}
+textarea{flex:1;background:#0c0c0b;color:#d8d4c8;border:none;padding:15px;font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:1.8;outline:none;resize:none;}
+.tab-bar{display:flex;background:var(--surf);border-bottom:1px solid var(--bd);}
+.tab{flex:1;padding:12px;background:none;border:none;color:var(--mu);font-size:10px;font-weight:900;cursor:pointer;border-bottom:2px solid transparent;}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold);}
 
-/* ── APP ── */
-.app{display:flex;flex:1;overflow:hidden;min-height:0;}
-
-/* ── SIDEBAR ── */
-.sidebar{width:220px;background:var(–surf);border-right:1px solid var(–bd);display:flex;flex-direction:column;flex-shrink:0;}
-.sb-label{padding:10px 14px;font-size:9px;font-weight:900;color:var(–mu);letter-spacing:.15em;border-bottom:1px solid var(–bd);}
-.song-list{flex:1;overflow-y:auto;padding:4px;}
-.song-list::-webkit-scrollbar{width:3px;}
-.song-list::-webkit-scrollbar-thumb{background:var(–bd2);}
-.song-item{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-radius:3px;font-size:11px;cursor:pointer;margin-bottom:1px;border:1px solid transparent;}
-.song-item:hover{background:var(–bg);}
-.song-item.active{background:#1c1a17;color:var(–gold);border-color:var(–gold);}
-.del-btn{color:#a04848;padding:1px 5px;font-size:13px;}
-.sb-new{margin:8px;background:var(–gold);border:none;padding:9px;font-weight:900;font-size:11px;cursor:pointer;border-radius:3px;width:calc(100% - 16px);}
-
-/* ── MAIN ── */
-.main{flex:1;display:grid;grid-template-columns:1fr 1.3fr;overflow:hidden;min-height:0;}
-.panel{display:flex;flex-direction:column;border-right:1px solid var(–bd);overflow:hidden;}
-.panel-head{padding:8px 14px;background:var(–surf);border-bottom:1px solid var(–bd);font-size:9px;font-weight:900;color:var(–gold);letter-spacing:.12em;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
-.meta-row{display:grid;grid-template-columns:1fr 1fr 60px;gap:7px;padding:10px 12px;border-bottom:1px solid var(–bd);flex-shrink:0;}
-input{background:#111;border:1px solid var(–bd2);color:#fff;padding:6px 8px;border-radius:3px;font-size:12px;outline:none;font-family:‘Lato’,sans-serif;}
-input::placeholder{color:#444;}
-input:focus{border-color:var(–gold);}
-textarea{flex:1;background:#0c0c0b;color:#d8d4c8;border:none;padding:14px;font-family:‘IBM Plex Mono’,monospace;font-size:12px;line-height:1.85;outline:none;resize:none;}
-.tab-bar{display:flex;background:var(–surf);border-bottom:1px solid var(–bd);flex-shrink:0;}
-.tab{flex:1;padding:10px 0;background:none;border:none;border-bottom:2px solid transparent;color:var(–mu);font-size:9px;font-weight:900;letter-spacing:.1em;cursor:pointer;font-family:‘Lato’,sans-serif;}
-.tab.active{color:var(–gold);border-bottom-color:var(–gold);}
-
-/* ── GRID PREVIEW ── */
-.grid-body{flex:1;overflow-y:auto;padding:32px 24px;background:#19171a;}
-.grid-body::-webkit-scrollbar{width:4px;}
-.grid-body::-webkit-scrollbar-thumb{background:var(–bd2);}
+/* GRID PREVIEW */
+.grid-body{flex:1;overflow-y:auto;padding:40px;background:#19171a;}
+.rb{background:#fff;padding:50px;width:100%;max-width:750px;margin:0 auto;color:#000;box-shadow:0 10px 40px rgba(0,0,0,0.5);font-family:'Patrick Hand', cursive;min-height:100%;}
+.rb-title{font-size:32px;line-height:1.1;margin-bottom:5px;}
+.rb-sub{font-size:16px;color:#555;margin-bottom:10px;}
+.rb-hr{border:none;border-top:2px solid #000;margin-bottom:30px;}
+.rb-system-wrap{margin-top:-1.5px; break-inside: avoid; page-break-inside: avoid;} /* EVITA QUEBRA NO MEIO DO COMPASSO */
+.rb-sec-group{margin-bottom:30px; break-inside: auto;}
 
 /* ════════════════════════════════════════════
-CHORD SHEET — ChordSheet.com faithful style
-Font: Patrick Hand (handwritten jazz feel)
-Colors: pure white background, black ink
-Bars: left-border only (no top/bottom lines)
-════════════════════════════════════════════ */
-.rb {
-background: #fff;
-padding: 48px 44px 56px;
-width: 100%;
-max-width: 720px;
-margin: 0 auto;
-color: #000;
-box-shadow: 0 8px 40px rgba(0,0,0,.6);
-font-family: ‘Patrick Hand’, cursive;
-}
-
-/* Title block */
-.rb-title {
-font-family: ‘Patrick Hand’, cursive;
-font-size: 30px;
-font-weight: 400;
-color: #000;
-line-height: 1.1;
-letter-spacing: .01em;
-}
-.rb-sub {
-font-family: ‘Patrick Hand’, cursive;
-font-size: 14px;
-color: #555;
-margin-top: 2px;
-}
-.rb-hr {
-border: none;
-border-top: 2px solid #000;
-margin: 10px 0 3px;
-}
-.rb-hr2 {
-border: none;
-border-top: 1px solid #000;
-margin: 0 0 26px;
-}
-
-/* Section group */
-.rb-sec { margin-bottom: 18px; }
-
-/* Section label — bordered box like ChordSheet.com */
-.rb-sec-label {
-display: inline-block;
-border: 1px solid #555;
-font-family: ‘Patrick Hand’, cursive;
-font-size: 12px;
-color: #444;
-padding: 1px 8px 2px;
-margin-bottom: 4px;
-line-height: 1.5;
-letter-spacing: .02em;
-}
-
-/* Bar row — no top/bottom borders, just structure */
-.rb-row {
-display: flex;
-align-items: stretch;
-margin-bottom: 2px;
-position: relative;
-}
-
-/* Closing barline via pseudo after row */
-.rb-row::after {
-content: ‘’;
-width: 1.5px;
-background: #888;
-flex-shrink: 0;
-align-self: stretch;
-}
-
-/* Each bar — left border IS the barline */
-.rb-bar {
-flex: 1;
-min-height: 70px;
-border-left: 1.5px solid #888;
-display: flex;
-align-items: center;
-justify-content: center;
-position: relative;
-padding: 10px 6px 6px;
-}
-
-/* Ritornello start bar (thick-thin-dots) */
-.rb-bar.rep-start {
-border-left: none;
-padding-left: 20px;
-}
-.rb-bar.rep-start::before {
-content: ‘’;
-position: absolute;
-left: 0; top: 0; bottom: 0;
-width: 5px;
-background: #000;
-box-shadow: 7px 0 0 0 #fff, 8px 0 0 0 #888;
-}
-
-/* Ritornello end — injected via JS as absolute positioned element */
-.rit-end-wrap {
-position: absolute;
-right: -11px;
-top: 0; bottom: 0;
-display: flex;
-align-items: stretch;
-z-index: 3;
-pointer-events: none;
-}
-.rit-end-thin { width: 1px; background: #888; }
-.rit-end-gap  { width: 2px; background: transparent; }
-.rit-end-thick{ width: 5px; background: #000; }
-
-/* Ritornello dots */
-.rit-dots {
-position: absolute;
-display: flex;
-flex-direction: column;
-gap: 6px;
-z-index: 4;
-}
-.rit-dots.rit-left  { left: 16px; top: 50%; transform: translateY(-50%); }
-.rit-dots.rit-right { right: 16px; top: 50%; transform: translateY(-50%); }
-.rit-dot { width: 5px; height: 5px; border-radius: 50%; background: #000; }
-
-/* Repeat count — top-right of row */
-.rb-rep-count {
-position: absolute;
-top: 3px; right: 8px;
-font-family: ‘Patrick Hand’, cursive;
-font-size: 13px;
-color: #444;
-line-height: 1;
-z-index: 5;
-}
-
-/* Chord text */
-.rb-chord {
-display: flex;
-align-items: baseline;
-justify-content: center;
-gap: 0;
-line-height: 1;
-padding-top: 4px;
-}
-.rb-chord-root {
-font-family: ‘Patrick Hand’, cursive;
-font-size: 32px;
-font-weight: 400;
-color: #000;
-letter-spacing: -.01em;
-line-height: 1;
-}
-.rb-chord-qual {
-font-family: ‘Patrick Hand’, cursive;
-font-size: 15px;
-color: #222;
-vertical-align: super;
-line-height: 1;
-letter-spacing: 0;
-}
-
-/* Measure repeat symbol */
-.rb-slash-wrap {
-display: flex;
-flex-direction: column;
-align-items: center;
-gap: 2px;
-padding-top: 4px;
-}
-.rb-slash-char {
-font-family: ‘Patrick Hand’, cursive;
-font-size: 28px;
-color: #bbb;
-line-height: .9;
-transform: rotate(-5deg);
-}
-.rb-slash-dots {
-display: flex;
-gap: 12px;
-margin-top: -2px;
-}
-.rb-slash-dot {
-width: 5px; height: 5px;
-border-radius: 50%;
-background: #bbb;
-}
-
-/* ════════════════════════════════════════════
-PRINT — proper multi-page PDF
-Key fixes:
-
-1. All panels hidden except .rb
-1. .rb gets page-break rules
-1. Each .rb-sec-group avoids mid-break
-1. White background forced everywhere
+   PRINT ENGINE - MULTI-PAGE SUPPORT
    ════════════════════════════════════════════ */
-   @media print {
-
-- { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-
-html, body {
-height: auto !important;
-overflow: visible !important;
-background: white !important;
-}
-
-header, .sidebar, .panel, .tab-bar { display: none !important; }
-
-.app { display: block !important; overflow: visible !important; }
-.main { display: block !important; overflow: visible !important; }
-
-.grid-body {
-display: block !important;
-overflow: visible !important;
-height: auto !important;
-padding: 0 !important;
-background: white !important;
-}
-
-#view-grid {
-display: block !important;
-overflow: visible !important;
-height: auto !important;
-}
-
-.rb {
-box-shadow: none !important;
-max-width: 100% !important;
-padding: 24px 28px !important;
-background: white !important;
-page-break-after: always;
-break-after: page;
-}
-
-/* Avoid breaking inside a section */
-.rb-sec {
-page-break-inside: avoid;
-break-inside: avoid;
-}
-
-/* Avoid breaking inside a bar row */
-.rb-row {
-page-break-inside: avoid;
-break-inside: avoid;
-}
-
-.rb-rep-count { color: #333 !important; }
-.rb-sec-label { color: #333 !important; border-color: #333 !important; }
+@media print {
+  @page { margin: 1cm; }
+  body, html { height: auto !important; overflow: visible !important; background: white !important; }
+  header, .sidebar, .panel, .tab-bar { display: none !important; }
+  .app, .main, .grid-body { display: block !important; overflow: visible !important; background: white !important; padding: 0 !important; }
+  .rb { box-shadow: none !important; max-width: 100% !important; padding: 0 !important; border: none !important; }
+  .rb-system-wrap { display: block; width: 100%; clear: both; }
 }
 </style>
-
 </head>
 <body>
 
 <header>
-  <div class="logo">ROADMAP MAKER PRO</div>
-  <button style="background:var(--gold);border:none;padding:7px 16px;font-weight:900;font-size:11px;cursor:pointer;border-radius:3px;letter-spacing:.05em;margin-left:auto;" onclick="printPDF()">IMPRIMIR PDF</button>
+  <div style="font-family:'Libre Baskerville';font-weight:700;color:var(--gold)">ROADMAP MAKER PRO</div>
+  <button style="background:var(--gold);border:none;padding:8px 16px;font-weight:900;cursor:pointer;border-radius:4px;" onclick="window.print()">IMPRIMIR / SALVAR PDF</button>
 </header>
 
 <div class="app">
   <div class="sidebar">
-    <div class="sb-label">Repertório</div>
-    <div id="songList" class="song-list"></div>
-    <button class="sb-new" onclick="createNewSong()">+ Nova Música</button>
+    <div style="padding:12px;font-size:10px;color:var(--mu);font-weight:900;border-bottom:1px solid var(--bd)">REPERTÓRIO</div>
+    <div id="songList" style="flex:1;overflow-y:auto;padding:5px"></div>
+    <button style="background:var(--gold);margin:10px;padding:10px;border:none;font-weight:900;cursor:pointer;border-radius:4px;" onclick="createNewSong()">+ NOVA MÚSICA</button>
   </div>
 
   <div class="main">
-    <!-- STEP 1 -->
     <div class="panel">
-      <div class="panel-head">01: CIFRA BRUTA (COLAR)</div>
+      <div class="panel-head">01: CIFRA BRUTA</div>
       <div class="meta-row">
-        <input type="text" id="iTitle" placeholder="Título" oninput="saveCurrent()">
-        <input type="text" id="iArtist" placeholder="Artista" oninput="saveCurrent()">
-        <input type="text" id="iKey" placeholder="Tom" oninput="saveCurrent()">
+        <input type="text" id="iTitle" placeholder="Título" oninput="save()">
+        <input type="text" id="iArtist" placeholder="Artista" oninput="save()">
+        <input type="text" id="iKey" placeholder="Tom" oninput="save()">
       </div>
-      <textarea id="cifraBruta" placeholder="Cole a cifra aqui..." oninput="autoClean()"></textarea>
+      <textarea id="cifraBruta" oninput="autoClean()"></textarea>
     </div>
 
-```
-<!-- STEPS 2+3 -->
-<div class="panel" style="border-right:none;">
-  <div class="tab-bar">
-    <button class="tab active" id="tab-cs" onclick="switchTab('cs')">02. MAPA DE TEXTO</button>
-    <button class="tab" id="tab-grid" onclick="switchTab('grid')">03. GRADE REAL BOOK</button>
-  </div>
-
-  <div id="view-cs" style="display:flex;flex:1;flex-direction:column;overflow:hidden;min-height:0;">
-    <div class="panel-head">
-      <span>EDITAR ROTEIRO</span>
-      <button style="background:var(--gold);border:none;padding:3px 9px;font-size:9px;font-weight:900;cursor:pointer;border-radius:3px;" onclick="applyAndSwitch()">&#9654; VER GRADE</button>
+    <div class="panel">
+      <div class="tab-bar">
+        <button class="tab active" id="tab-cs" onclick="switchTab('cs')">02. MAPA DE TEXTO</button>
+        <button class="tab" id="tab-grid" onclick="switchTab('grid')">03. GRADE REAL BOOK</button>
+      </div>
+      <div id="view-cs" style="display:flex;flex:1;flex-direction:column;">
+        <div class="panel-head">EDITAR ROTEIRO <button style="background:var(--gold);border:none;padding:3px 8px;font-size:9px;font-weight:900;cursor:pointer" onclick="update()">⚡ ATUALIZAR</button></div>
+        <textarea id="csEdit" oninput="save();update();"></textarea>
+      </div>
+      <div id="view-grid" style="display:none;flex:1;" class="grid-body">
+        <div id="out" class="rb"></div>
+      </div>
     </div>
-    <textarea id="csEdit" placeholder=": Intro&#10;F#m D7 A E5&#10;&#10;: Verso&#10;( F#m D7 A E5 ) x4&#10;&#10;: Ponte&#10;( D E5 ) x2&#10;D E % %" oninput="saveCurrent(); updateGrid();"></textarea>
-  </div>
-
-  <div id="view-grid" style="display:none;flex:1;overflow:hidden;min-height:0;" class="grid-body">
-    <div id="out" class="rb">
-      <div style="opacity:.3;font-family:'Patrick Hand',cursive;font-size:18px;text-align:center;padding:60px 0;color:#000;">Cole uma cifra para gerar o grade</div>
-    </div>
-  </div>
-</div>
-```
-
   </div>
 </div>
 
 <script>
-/* ── STATE ── */
-let songs = JSON.parse(localStorage.getItem('roadmap_v6') || '[]');
+let songs = JSON.parse(localStorage.getItem('roadmap_v7_final') || '[]');
 let currentId = null;
+const W = 600, H = 65, barW = W/4;
 
-/* ── UTILS ── */
-function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-/* ── NORMALIZE CHORD ── */
-function norm(raw) {
-  let c = String(raw).trim();
-  if (!c || c === '%') return c || null;
-  c = c.replace(/\([^)]*\)/g, '');
-  c = c.replace(/[Mm]aj7/gi, 'Δ7').replace(/7M$/, 'Δ7').replace(/M7$/, 'Δ7');
-  c = c.replace(/[Mm]7b5/gi, 'ø7');
-  c = c.replace(/([A-G][b#]?)mi\b/g, '$1m');
-  c = c.replace(/([A-G][b#]?)-(?=[^0-9\/]|$)/g, '$1m');
-  c = c.replace(/^([a-g])([b#]?)(.*)$/, (_, r, a, rest) => r.toUpperCase() + a + (rest || 'm'));
-  c = c.replace(/[♭]/g, 'b').replace(/[♯]/g, '#');
-  return c.trim() || null;
+function switchTab(t){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+  document.getElementById('view-cs').style.display=t==='cs'?'flex':'none';
+  document.getElementById('view-grid').style.display=t==='grid'?'flex':'none';
+  if(t==='grid') update();
 }
 
-/* ── CHORD LINE DETECTION ── */
-const CTR = /^[A-Ga-g][b#]?(?:m(?:aj)?|maj|sus|dim|aug|add)?[0-9]?(?:maj|sus|dim|aug|add)?[0-9]?(?:[b#][0-9])?(?:\/[A-G][b#]?)?$/;
-function isCT(w) { const c = w.replace(/[(),]/g,'').trim(); return c.length > 0 && c.length <= 10 && CTR.test(c); }
-function isCL(line) {
-  const t = line.trim();
-  if (!t) return false;
-  if (/\[[A-G][^\]]{0,9}\]/.test(t)) return true;
-  const toks = t.split(/\s+/).filter(Boolean);
-  if (!toks.length || !toks.some(x => /^[A-Ga-g]/.test(x))) return false;
-  return toks.every(isCT);
-}
-const SERE = /^(intro|verso|vers[ao]|refrão|refrao|chorus|ponte|bridge|solo|outro|coda|pre.?refr|pre.?chorus|segunda|primeira|terceira|parte|variacao|variação|corpo|estrutura|passagem|final|tag|breakdown|instrumental)[\s:]*$/i;
-
-/* ── AUTO CLEAN: raw cifra → CS text ── */
-function autoClean() {
+function autoClean(){
   const raw = document.getElementById('cifraBruta').value;
   const lines = raw.split('\n');
-  const out = [];
-  let titleSet = false;
+  let map = [];
+  lines.forEach(l=>{
+    let t = l.trim();
+    if(!t) return;
+    let sec = t.match(/\[(.*?)\]/);
+    if(sec) { map.push(`: ${sec[1]}`); return; }
+    const chords = t.match(/\b([A-G][b#]?(maj7|m7b5|ø7|m7|7|Δ7|dim7|m|sus4|add9|9|C9|4|D4)?)\b/g);
+    if(chords) map.push(chords.join('  '));
+  });
+  document.getElementById('csEdit').value = map.join('\n');
+  save(); update();
+}
 
-  for (const rawLine of lines) {
-    const t = rawLine.trim();
-    if (!t) continue;
-    if (/^\{.+\}$/.test(t)) continue;
+function renderSVG(line, label, isFirstInSec, isRep){
+  let svg = `<svg viewBox="0 -25 ${W} ${H+25}" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;overflow:visible;">`;
+  const midY = H/2;
+  
+  svg += `<line x1="0" y1="0" x2="${W}" y2="0" stroke="black" stroke-width="2.5"/>`;
+  svg += `<line x1="0" y1="${H}" x2="${W}" y2="${H}" stroke="black" stroke-width="2.5"/>`;
+  
+  for(let i=0; i<=4; i++){
+    let sw = (i===0 || i===4) ? 3 : 1.2;
+    svg += `<line x1="${i*barW}" y1="0" x2="${i*barW}" y2="${H}" stroke="black" stroke-width="${sw}"/>`;
+  }
 
-    // Detect title/artist on first non-chord, non-directive line
-    if (!titleSet && !t.startsWith('[') && !isCL(t) && !SERE.test(t.replace(/:$/,''))) {
-      if (t.includes(' - ')) {
-        const p = t.split(' - ');
-        if (!document.getElementById('iArtist').value) document.getElementById('iArtist').value = p[0].trim();
-        if (!document.getElementById('iTitle').value)  document.getElementById('iTitle').value  = p.slice(1).join(' - ').trim();
-      } else if (!document.getElementById('iTitle').value) {
-        document.getElementById('iTitle').value = t;
+  if(isRep && isFirstInSec){
+    svg += `<line x1="8" y1="0" x2="8" y2="${H}" stroke="black" stroke-width="1"/>`;
+    svg += `<rect x="0" y="0" width="5" height="${H}" fill="black"/>`;
+    svg += `<circle cx="16" cy="${midY-8}" r="2.8" fill="black"/><circle cx="16" cy="${midY+8}" r="2.8" fill="black"/>`;
+  }
+
+  if(label && isFirstInSec){
+    svg += `<rect x="0" y="-22" width="22" height="20" fill="white" stroke="black" stroke-width="1.5"/>`;
+    svg += `<text x="11" y="-12" font-family="Patrick Hand" font-size="12" font-weight="700" text-anchor="middle" dominant-baseline="central">${label[0].toUpperCase()}</text>`;
+  }
+
+  const chords = line.trim().split(/\s+/).slice(0,4);
+  chords.forEach((chord, i)=>{
+    const cx = i*barW + barW/2;
+    if(chord==='%' || !chord){
+      svg += `<line x1="${cx-12}" y1="${midY+12}" x2="${cx+12}" y2="${midY-12}" stroke="#888" stroke-width="2"/>`;
+      svg += `<circle cx="${cx-8}" cy="${midY-8}" r="2.5" fill="#888"/><circle cx="${cx+8}" cy="${midY+8}" r="2.5" fill="#888"/>`;
+    } else {
+      let m = chord.match(/^([A-G][b#]?)(.*)$/);
+      if(m){
+        svg += `<text x="${cx}" y="${midY}" font-family="Patrick Hand" font-size="34" text-anchor="middle" dominant-baseline="central">${m[1]}<tspan dy="-10" font-size="16">${m[2].replace(/maj7/gi,'Δ7').replace(/m7b5/gi,'ø7')}</tspan></text>`;
       }
-      titleSet = true;
-      continue;
     }
-
-    // Section bracket [Name]
-    const bm = t.match(/^\[([^\]]+)\]$/);
-    if (bm) {
-      const inn = bm[1].trim();
-      if (/^[A-G][b#]?/.test(inn) && inn.length <= 10 && !inn.includes(' ')) { /* chord line */ }
-      else { out.push(': ' + inn); continue; }
-    }
-
-    // Section keyword
-    if (SERE.test(t.replace(/:$/, ''))) { out.push(': ' + t.replace(/:$/, '').trim()); continue; }
-
-    // Inline [chord]
-    if (t.includes('[')) {
-      const chords = []; const re = /\[([^\]]+)\]/g; let m;
-      while ((m = re.exec(t)) !== null) { const n = norm(m[1].trim()); if (n) chords.push(n); }
-      if (chords.length) out.push(chords.join(' '));
-      continue;
-    }
-
-    // Free-form chord line
-    if (isCL(t)) {
-      const chords = t.split(/\s+/).filter(Boolean).map(tok => norm(tok.replace(/[(),]/g,''))).filter(Boolean);
-      if (chords.length) out.push(chords.join(' '));
-    }
-  }
-
-  document.getElementById('csEdit').value = out.join('\n');
-  saveCurrent();
-  updateGrid();
-}
-
-/* ── PARSE CS TEXT → MODEL ── */
-function parseCS(text) {
-  const lines = text.split('\n');
-  const secs = []; let curN = null, curT = [];
-
-  function flush() { if (curN !== null || curT.length > 0) secs.push({ name: curN, tokens: [...curT], rep: 0 }); }
-
-  for (const raw of lines) {
-    const t = raw.trim();
-    if (!t) continue;
-    if (t[0] === ':' || t[0] === '=') { flush(); curN = t.slice(1).trim(); curT = []; continue; }
-    const rm = t.match(/^\((.+?)\)\s*x(\d+)$/i);
-    if (rm) { flush(); secs.push({ name: curN, tokens: parseTL(rm[1]), rep: parseInt(rm[2]) }); curN = null; curT = []; continue; }
-    parseTL(t).forEach(tok => curT.push(tok));
-  }
-  flush();
-
-  return secs.map(sec => {
-    const rows = [];
-    for (let i = 0; i < sec.tokens.length; i += 4) {
-      const row = sec.tokens.slice(i, i + 4);
-      while (row.length < 4) row.push(null);
-      rows.push(row);
-    }
-    return { name: sec.name, rows, rep: sec.rep || 0 };
   });
+  return svg + `</svg>`;
 }
 
-function parseTL(line) {
-  const toks = [];
-  line.split(/\s+/).filter(Boolean).forEach(p => {
-    if (p === '%') { toks.push('%'); return; }
-    if (p.includes('_')) { const h = p.split('_'); toks.push(norm(h[0])||h[0]); toks.push(norm(h[1])||h[1]); return; }
-    const n = norm(p); if (n) toks.push(n);
-  });
-  return toks;
-}
-
-/* ── RENDER CHORD ── */
-function renderChord(chord) {
-  if (!chord || chord === '%') {
-    return `<div class="rb-slash-wrap">
-      <div class="rb-slash-dots"><div class="rb-slash-dot"></div></div>
-      <div class="rb-slash-char">&#x2215;</div>
-      <div class="rb-slash-dots"><div class="rb-slash-dot"></div></div>
-    </div>`;
-  }
-  const m = chord.match(/^([A-G][b#]?)(.*)$/);
-  if (!m) return `<div class="rb-chord"><span class="rb-chord-root">${esc(chord)}</span></div>`;
-  const root = m[1], qual = m[2] || '';
-  return `<div class="rb-chord">
-    <span class="rb-chord-root">${esc(root)}</span>${qual ? `<span class="rb-chord-qual">${esc(qual)}</span>` : ''}
-  </div>`;
-}
-
-/* ── RENDER ROW ── */
-function renderRow(row, isFirst, isLast, isRep, repCount) {
-  let html = `<div class="rb-row">`;
-
-  row.forEach((chord, ci) => {
-    const isRepStart = isRep && isFirst && ci === 0;
-    const isRepEnd   = isRep && isLast  && ci === 3;
-
-    let barClass = 'rb-bar';
-    if (isRepStart) barClass += ' rep-start';
-
-    html += `<div class="${barClass}">`;
-
-    // Ritornello start dots
-    if (isRepStart) {
-      html += `<div class="rit-dots rit-left"><div class="rit-dot"></div><div class="rit-dot"></div></div>`;
-    }
-
-    html += renderChord(chord);
-
-    // Ritornello end: thin+gap+thick + dots
-    if (isRepEnd) {
-      html += `<div class="rit-end-wrap"><div class="rit-end-thin"></div><div class="rit-end-gap"></div><div class="rit-end-thick"></div></div>`;
-      html += `<div class="rit-dots rit-right"><div class="rit-dot"></div><div class="rit-dot"></div></div>`;
-    }
-
-    html += `</div>`; // bar
-  });
-
-  // Repeat count top-right on last row
-  if (isRep && isLast) {
-    html += `<div class="rb-rep-count">x${repCount}</div>`;
-  }
-
-  html += `</div>`; // row
-  return html;
-}
-
-/* ── UPDATE GRID ── */
-function updateGrid() {
-  const title  = document.getElementById('iTitle').value  || 'Sem Título';
+function update(){
+  const out = document.getElementById('out');
+  const title = document.getElementById('iTitle').value || 'Música';
   const artist = document.getElementById('iArtist').value || '';
-  const key    = document.getElementById('iKey').value    || '';
-  const text   = document.getElementById('csEdit').value;
-  const out    = document.getElementById('out');
+  const key = document.getElementById('iKey').value || '';
+  const text = document.getElementById('csEdit').value;
 
-  let html = `<div class="rb-title">${esc(title)}</div>`;
-  const subParts = [artist, key ? 'Tom: ' + key : ''].filter(Boolean);
-  if (subParts.length) html += `<div class="rb-sub">${esc(subParts.join(' | '))}</div>`;
-  html += `<hr class="rb-hr"><hr class="rb-hr2">`;
+  let html = `<div class="rb-title">${title}</div>`;
+  html += `<div class="rb-sub">${artist} ${key ? '| Tom: '+key : ''}</div><hr class="rb-hr">`;
 
-  if (!text.trim()) {
-    html += `<div style="opacity:.3;font-family:'Patrick Hand',cursive;font-size:17px;text-align:center;padding:40px 0;color:#000;">Edite o texto no passo 2</div>`;
-    out.innerHTML = html; return;
-  }
+  const lines = text.split('\n').map(l=>l.trim()).filter(l=>l!=="");
+  let currentLabel = null;
+  let grid = `<div class="rb-sec-group">`;
 
-  const sections = parseCS(text);
-  sections.forEach(sec => {
-    html += `<div class="rb-sec">`;
-    if (sec.name) html += `<div class="rb-sec-label">${esc(sec.name)}</div>`;
-    const isRep = sec.rep > 1;
-    sec.rows.forEach((row, ri) => {
-      html += renderRow(row, ri === 0, ri === sec.rows.length - 1, isRep, sec.rep);
-    });
-    html += `</div>`;
+  lines.forEach((line, idx)=>{
+    if(line.startsWith(':')){
+      if(idx > 0) grid += `</div><div class="rb-sec-group">`;
+      currentLabel = line.replace(':','').trim();
+    } else {
+      const isRep = line.includes('(') || line.includes('x');
+      const cleanLine = line.replace(/[()]/g,'').replace(/ x\d+/,'');
+      grid += `<div class="rb-system-wrap">${renderSVG(cleanLine, currentLabel, !!currentLabel, isRep)}</div>`;
+      currentLabel = null;
+    }
   });
-
-  out.innerHTML = html;
+  out.innerHTML = html + grid + `</div>`;
 }
 
-/* ── TABS ── */
-function switchTab(t) {
-  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + t).classList.add('active');
-  document.getElementById('view-cs').style.display   = t === 'cs'   ? 'flex'  : 'none';
-  document.getElementById('view-grid').style.display = t === 'grid' ? 'flex'  : 'none';
-  if (t === 'grid') updateGrid();
+function createNewSong(){
+  let s = {id:Date.now(), title:'', artist:'', key:'', raw:'', clean:''};
+  songs.push(s); load(s.id);
 }
-
-function applyAndSwitch() {
-  saveCurrent();
-  updateGrid();
-  switchTab('grid');
+function load(id){
+  currentId = id; const s = songs.find(x=>x.id===id);
+  if(!s) return;
+  document.getElementById('iTitle').value=s.title||'';
+  document.getElementById('iArtist').value=s.artist||'';
+  document.getElementById('iKey').value=s.key||'';
+  document.getElementById('cifraBruta').value=s.raw||'';
+  document.getElementById('csEdit').value=s.clean||'';
+  renderSongs(); update();
 }
-
-/* ── PRINT ── */
-function printPDF() {
-  // Force grid tab visible before printing so the browser sees the content
-  const wasGrid = document.getElementById('view-grid').style.display === 'flex';
-  document.getElementById('view-cs').style.display   = 'none';
-  document.getElementById('view-grid').style.display = 'block';
-  updateGrid();
-  setTimeout(() => {
-    window.print();
-    // Restore state after print dialog
-    setTimeout(() => {
-      if (!wasGrid) {
-        document.getElementById('view-cs').style.display   = 'flex';
-        document.getElementById('view-grid').style.display = 'none';
-      }
-    }, 500);
-  }, 150);
+function save(){
+  if(!currentId) return; const s = songs.find(x=>x.id===currentId);
+  s.title=document.getElementById('iTitle').value;
+  s.artist=document.getElementById('iArtist').value;
+  s.key=document.getElementById('iKey').value;
+  s.raw=document.getElementById('cifraBruta').value;
+  s.clean=document.getElementById('csEdit').value;
+  localStorage.setItem('roadmap_v7_final', JSON.stringify(songs));
+  renderSongs();
 }
-
-/* ── STORAGE ── */
-function createNewSong() {
-  const s = { id: Date.now(), title: '', artist: '', key: '', raw: '', clean: '' };
-  songs.push(s); loadSong(s.id);
-}
-
-function loadSong(id) {
-  currentId = id;
-  const s = songs.find(x => x.id === id);
-  document.getElementById('iTitle').value    = s.title  || '';
-  document.getElementById('iArtist').value   = s.artist || '';
-  document.getElementById('iKey').value      = s.key    || '';
-  document.getElementById('cifraBruta').value = s.raw   || '';
-  document.getElementById('csEdit').value    = s.clean  || '';
-  renderList(); updateGrid();
-}
-
-function saveCurrent() {
-  if (!currentId) return;
-  const s = songs.find(x => x.id === currentId);
-  if (!s) return;
-  s.title  = document.getElementById('iTitle').value;
-  s.artist = document.getElementById('iArtist').value;
-  s.key    = document.getElementById('iKey').value;
-  s.raw    = document.getElementById('cifraBruta').value;
-  s.clean  = document.getElementById('csEdit').value;
-  localStorage.setItem('roadmap_v6', JSON.stringify(songs));
-  renderList();
-}
-
-function deleteSong(id, e) {
-  e.stopPropagation();
-  if (!confirm('Remover música?')) return;
-  songs = songs.filter(x => x.id !== id);
-  localStorage.setItem('roadmap_v6', JSON.stringify(songs));
-  songs.length > 0 ? loadSong(songs[0].id) : createNewSong();
-}
-
-function renderList() {
-  document.getElementById('songList').innerHTML = songs.map(s => `
-    <div class="song-item ${s.id === currentId ? 'active' : ''}" onclick="loadSong(${s.id})">
-      <span>${esc(s.title || 'Nova Música')}</span>
-      <span class="del-btn" onclick="deleteSong(${s.id}, event)">✕</span>
+function renderSongs(){
+  document.getElementById('songList').innerHTML = songs.map(s=>`
+    <div class="song-item ${s.id===currentId?'active':''}" onclick="load(${s.id})">
+      <span>${s.title||'Nova Música'}</span>
+      <span class="del-btn" onclick="deleteSong(${s.id},event)">✕</span>
     </div>`).join('');
 }
-
-/* INIT */
-songs.length > 0 ? loadSong(songs[0].id) : createNewSong();
+function deleteSong(id,e){
+  e.stopPropagation(); if(!confirm('Excluir?')) return;
+  songs = songs.filter(x=>x.id!==id);
+  localStorage.setItem('roadmap_v7_final', JSON.stringify(songs));
+  songs.length>0?load(songs[0].id):location.reload();
+}
+if(songs.length>0) load(songs[0].id); else createNewSong();
 </script>
-
 </body>
 </html>
