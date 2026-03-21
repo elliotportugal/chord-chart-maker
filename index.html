@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Roadmap Maker PRO</title>
 <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Libre+Baskerville:wght@700&family=IBM+Plex+Mono:wght@400;700&family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
 <style>
 :root {
   --bg:#0f0e0d; --surf:#181714; --bd:#2e2c28; --tx:#e6e2d6; --mu:#746e62; --gold:#c8a84b;
@@ -12,10 +14,10 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Lato',sans-serif;background:var(--bg);color:var(--tx);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
 
-/* Interface */
+/* UI Layout */
 header{background:var(--surf);height:50px;display:flex;align-items:center;padding:0 20px;border-bottom:1px solid var(--bd);justify-content:space-between;flex-shrink:0;}
 .app{display:flex;flex:1;overflow:hidden;}
-.sidebar{width:220px;background:var(--surf);border-right:1px solid var(--bd);display:flex;flex-direction:column;flex-shrink:0;}
+.sidebar{width:200px;background:var(--surf);border-right:1px solid var(--bd);display:flex;flex-direction:column;flex-shrink:0;}
 .main{flex:1;display:grid;grid-template-columns:1fr 1.3fr;overflow:hidden;}
 .panel{display:flex;flex-direction:column;border-right:1px solid var(--bd);overflow:hidden;}
 .panel-head{padding:8px 14px;background:var(--surf);border-bottom:1px solid var(--bd);font-size:10px;font-weight:900;color:var(--gold);display:flex;justify-content:space-between;align-items:center;}
@@ -23,52 +25,41 @@ header{background:var(--surf);height:50px;display:flex;align-items:center;paddin
 input{background:#111;border:1px solid #3e3c38;color:#fff;padding:6px;border-radius:4px;font-size:12px;outline:none;}
 textarea{flex:1;background:#0c0c0b;color:#d8d4c8;border:none;padding:15px;font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:1.8;outline:none;resize:none;}
 
-/* Preview - Estilo A4 ChordSheet */
+/* ESTILO CHORDSHEET (PDF FEEL) */
 .grid-body{flex:1;overflow-y:auto;padding:40px;background:#19171a; display: flex; flex-direction: column; align-items: center;}
 
 .rb {
   background:#fff;
-  padding: 60px 50px;
-  width: 210mm; /* Largura A4 */
-  min-height: 297mm; /* Altura A4 */
+  padding: 1.5cm 2cm;
+  width: 210mm;
+  min-height: 297mm;
   color:#000;
   font-family:'Patrick Hand', cursive;
   position: relative;
   box-shadow: 0 10px 40px rgba(0,0,0,0.5);
 }
 
-/* Linha guia de quebra de página (Apenas no Editor) */
-.page-break-guide {
-  position: absolute;
-  top: 297mm;
-  left: 0;
-  width: 100%;
-  border-top: 2px dashed #ff4444;
-  pointer-events: none;
-  z-index: 10;
-}
-.page-break-guide::after {
-  content: "LIMITE DA PÁGINA 1 (A4)";
-  position: absolute;
-  right: 10px;
-  top: -20px;
-  color: #ff4444;
-  font-size: 10px;
-  font-family: sans-serif;
-  font-weight: bold;
+.rb-title{font-size:32px; line-height:1; font-weight: 700; text-transform: uppercase; margin-bottom: 5px;}
+.rb-sub{font-size:18px; color:#333; margin-bottom: 10px;}
+.rb-hr{border:none; border-top:2.5px solid #000; margin-bottom: 30px;}
+
+.rb-sec-group { margin-top: 25px; margin-bottom: 10px; }
+.rb-sec-label { 
+    font-size: 20px; 
+    font-weight: 400; 
+    margin-bottom: 8px; 
+    color: #000; 
+    font-family: 'Patrick Hand', cursive;
 }
 
-.rb-title{font-size:36px; line-height:1; margin-bottom:5px;}
-.rb-sub{font-size:18px; color:#555; margin-bottom:15px;}
-.rb-hr{border:none; border-top:2px solid #000; margin-bottom:30px;}
-
-/* Sistemas de pauta fluida */
 .rb-system-wrap { margin-top: -1.5px; break-inside: avoid; }
-.rb-sec-group { margin-bottom: 35px; }
+
+/* Guia A4 */
+.page-break-guide { border-top: 2px dashed #ff4444; margin-top: 297mm; position: absolute; width: 100%; left: 0; pointer-events: none;}
 
 @media print {
   body, html { height: auto !important; overflow: visible !important; }
-  header, .sidebar, .panel, .tab-bar, .page-break-guide { display: none !important; }
+  header, .sidebar, .panel, .page-break-guide { display: none !important; }
   .app, .main, .grid-body { display: block !important; overflow: visible !important; background: white !important; padding: 0 !important; }
   .rb { box-shadow: none !important; width: 100% !important; padding: 1.5cm !important; }
 }
@@ -77,8 +68,11 @@ textarea{flex:1;background:#0c0c0b;color:#d8d4c8;border:none;padding:15px;font-f
 <body>
 
 <header>
-  <div style="font-family:'Libre Baskerville';font-weight:700;color:var(--gold)">ROADMAP MAKER PRO</div>
-  <button style="background:var(--gold);border:none;padding:8px 16px;font-weight:900;cursor:pointer;border-radius:4px;" onclick="window.print()">IMPRIMIR PDF</button>
+    <div style="font-family:'Libre Baskerville';font-weight:700;color:var(--gold)">ROADMAP MAKER PRO</div>
+    <div style="display:flex; gap:10px">
+        <button style="background:#2e2c28; color:white; border:none; padding:8px 16px; font-weight:900; cursor:pointer; border-radius:4px;" onclick="exportPDF()">EXPORTAR PDF</button>
+        <button style="background:var(--gold); border:none; padding:8px 16px; font-weight:900; cursor:pointer; border-radius:4px;" onclick="window.print()">IMPRIMIR</button>
+    </div>
 </header>
 
 <div class="app">
@@ -100,24 +94,29 @@ textarea{flex:1;background:#0c0c0b;color:#d8d4c8;border:none;padding:15px;font-f
     </div>
 
     <div class="panel">
-      <div style="display:flex; background:var(--surf); border-bottom:1px solid var(--bd);">
-        <button class="tab active" style="flex:1; padding:12px; background:none; border:none; color:var(--gold); font-size:10px; font-weight:900; border-bottom:2px solid var(--gold)">ROTEIRO & GRADE</button>
-      </div>
-      <div style="display:flex; flex:1; flex-direction:column; overflow-y: auto;">
-        <textarea id="csEdit" style="flex: 0 0 300px; background:#111; border-bottom: 2px solid var(--bd);" oninput="save();update();"></textarea>
-        <div class="grid-body">
-          <div id="out" class="rb">
-            </div>
-        </div>
+      <div class="panel-head">02: MAPA DE TEXTO & GRADE</div>
+      <textarea id="csEdit" style="flex: 0 0 250px; background:#111; border-bottom: 2px solid var(--bd);" oninput="save();update();"></textarea>
+      <div class="grid-body">
+        <div id="out" class="rb"></div>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-let songs = JSON.parse(localStorage.getItem('roadmap_v9_final') || '[]');
+let songs = JSON.parse(localStorage.getItem('roadmap_v11') || '[]');
 let currentId = null;
-const W = 600, H = 65, barW = W/4;
+const W = 600, H = 60, barW = W/4;
+
+function exportPDF() {
+    const element = document.getElementById('out');
+    const opt = {
+        margin: 0,
+        filename: `${document.getElementById('iTitle').value || 'roadmap'}.pdf`,
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(element).save();
+}
 
 function autoClean(){
   const raw = document.getElementById('cifraBruta').value;
@@ -126,8 +125,10 @@ function autoClean(){
   lines.forEach(l=>{
     let t = l.trim();
     if(!t) return;
+    // Captura seções entre colchetes
     let sec = t.match(/\[(.*?)\]/);
     if(sec) { map.push(`: ${sec[1]}`); return; }
+    // Captura acordes
     const chords = t.match(/\b([A-G][b#]?(maj7|m7b5|ø7|m7|7|Δ7|dim7|m|sus4|add9|9|C9|4|D4)?)\b/g);
     if(chords) map.push(chords.join('  '));
   });
@@ -135,39 +136,37 @@ function autoClean(){
   save(); update();
 }
 
-function renderSVG(line, label, isFirstInSec, isRep){
-  let svg = `<svg viewBox="0 -30 ${W} ${H+30}" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;overflow:visible;">`;
+function renderSVG(line, isRep){
+  let svg = `<svg viewBox="0 -5 ${W} ${H+10}" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;overflow:visible;">`;
   const midY = H/2;
   
-  // Linhas horizontais (Pauta Estilo Real Book)
-  svg += `<line x1="0" y1="0" x2="${W}" y2="0" stroke="black" stroke-width="2"/>`;
-  svg += `<line x1="0" y1="${H}" x2="${W}" y2="${H}" stroke="black" stroke-width="2"/>`;
+  // Pauta Horizontal (Fina como no PDF)
+  svg += `<line x1="0" y1="0" x2="${W}" y2="0" stroke="black" stroke-width="1.2"/>`;
+  svg += `<line x1="0" y1="${H}" x2="${W}" y2="${H}" stroke="black" stroke-width="1.2"/>`;
   
+  // Barlines (Externa 2px, Interna 0.8px)
   for(let i=0; i<=4; i++){
-    let sw = (i===0 || i===4) ? 2.5 : 1;
+    let sw = (i===0 || i===4) ? 2 : 0.8;
     svg += `<line x1="${i*barW}" y1="0" x2="${i*barW}" y2="${H}" stroke="black" stroke-width="${sw}"/>`;
   }
 
-  if(isRep && isFirstInSec){
-    svg += `<rect x="0" y="0" width="5" height="${H}" fill="black"/>`;
-    svg += `<circle cx="15" cy="${midY-8}" r="2.8" fill="black"/><circle cx="15" cy="${midY+8}" r="2.8" fill="black"/>`;
-  }
-
-  if(label && isFirstInSec){
-    svg += `<rect x="0" y="-24" width="22" height="22" fill="white" stroke="black" stroke-width="1.2"/>`;
-    svg += `<text x="11" y="-13" font-family="Patrick Hand" font-size="14" font-weight="700" text-anchor="middle" dominant-baseline="central">${label[0].toUpperCase()}</text>`;
+  // Ritornello
+  if(isRep){
+    svg += `<rect x="0" y="0" width="4" height="${H}" fill="black"/>`;
+    svg += `<circle cx="12" cy="${midY-8}" r="2.5" fill="black"/><circle cx="12" cy="${midY+8}" r="2.5" fill="black"/>`;
   }
 
   const chords = line.trim().split(/\s+/).slice(0,4);
   chords.forEach((chord, i)=>{
     const cx = i*barW + barW/2;
     if(chord==='%' || !chord){
-      svg += `<line x1="${cx-12}" y1="${midY+12}" x2="${cx+12}" y2="${midY-12}" stroke="#888" stroke-width="2"/>`;
-      svg += `<circle cx="${cx-8}" cy="${midY-8}" r="2.5" fill="#888"/><circle cx="${cx+8}" cy="${midY+8}" r="2.5" fill="#888"/>`;
+      svg += `<line x1="${cx-8}" y1="${midY+8}" x2="${cx+8}" y2="${midY-8}" stroke="#999" stroke-width="1.5"/>`;
+      svg += `<circle cx="${cx-5}" cy="${midY-5}" r="1.8" fill="#999"/><circle cx="${cx+5}" cy="${midY+5}" r="1.8" fill="#999"/>`;
     } else {
       let m = chord.match(/^([A-G][b#]?)(.*)$/);
       if(m){
-        svg += `<text x="${cx}" y="${midY}" font-family="Patrick Hand" font-size="38" text-anchor="middle" dominant-baseline="central">${m[1]}<tspan dy="-12" font-size="20">${m[2].replace(/maj7/gi,'Δ7').replace(/m7b5/gi,'ø7')}</tspan></text>`;
+        let q = m[2].replace(/maj7/gi,'Δ7').replace(/m7b5/gi,'ø7');
+        svg += `<text x="${cx}" y="${midY+5}" font-family="Patrick Hand" font-size="32" text-anchor="middle" dominant-baseline="central">${m[1]}<tspan dy="-12" font-size="18">${q}</tspan></text>`;
       }
     }
   });
@@ -176,31 +175,29 @@ function renderSVG(line, label, isFirstInSec, isRep){
 
 function update(){
   const out = document.getElementById('out');
-  const title = document.getElementById('iTitle').value || 'Música';
-  const artist = document.getElementById('iArtist').value || '';
+  const title = document.getElementById('iTitle').value || 'SEM TÍTULO';
+  const artist = document.getElementById('iArtist').value || 'ARTISTA';
   const key = document.getElementById('iKey').value || '';
   const text = document.getElementById('csEdit').value;
 
   let html = `<div class="rb-title">${title}</div><div class="rb-sub">${artist} ${key ? '| Tom: '+key : ''}</div><hr class="rb-hr">`;
 
   const lines = text.split('\n').map(l=>l.trim()).filter(l=>l!=="");
-  let currentLabel = null;
-  let grid = `<div class="rb-sec-group">`;
+  let grid = "";
 
   lines.forEach((line, idx)=>{
-    if(line.startsWith(':')){
-      if(idx > 0) grid += `</div><div class="rb-sec-group">`;
-      currentLabel = line.replace(':','').trim();
+    if (line.startsWith(':')) {
+      // Formatação de Título de Seção igual ao PDF
+      grid += `<div class="rb-sec-group"><div class="rb-sec-label">${line.replace(':', '').trim()}</div>`;
     } else {
       const isRep = line.includes('(') || line.includes('x');
       const cleanLine = line.replace(/[()]/g,'').replace(/ x\d+/,'');
-      grid += `<div class="rb-system-wrap">${renderSVG(cleanLine, currentLabel, !!currentLabel, isRep)}</div>`;
-      currentLabel = null;
+      grid += `<div class="rb-system-wrap">${renderSVG(cleanLine, isRep)}</div>`;
+      // Se a próxima linha for uma seção, fecha o grupo atual
+      if (lines[idx+1] && lines[idx+1].startsWith(':')) grid += `</div>`;
     }
   });
   
-  // Adiciona a guia de página no final
-  grid += `<div class="page-break-guide"></div>`;
   out.innerHTML = html + grid + `</div>`;
 }
 
@@ -225,11 +222,11 @@ function save(){
   s.key=document.getElementById('iKey').value;
   s.raw=document.getElementById('cifraBruta').value;
   s.clean=document.getElementById('csEdit').value;
-  localStorage.setItem('roadmap_v9_final', JSON.stringify(songs));
+  localStorage.setItem('roadmap_v11', JSON.stringify(songs));
   renderSongs();
 }
 function renderSongs(){
-  document.getElementById('songList').innerHTML = songs.map(s=>`<div class="song-item" onclick="load(${s.id})" style="padding:8px; cursor:pointer; font-size:12px; border-bottom:1px solid #2e2c28">${s.title||'Nova Música'}</div>`).join('');
+  document.getElementById('songList').innerHTML = songs.map(s=>`<div class="song-item" onclick="load(${s.id})" style="padding:10px; cursor:pointer; font-size:12px; border-bottom:1px solid #2e2c28">${s.title||'Nova Música'}</div>`).join('');
 }
 if(songs.length>0) load(songs[0].id); else createNewSong();
 </script>
