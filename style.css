@@ -1,18 +1,18 @@
-/* RESET */
+/* ================= RESET ================= */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-/* BASE */
+/* ================= BASE ================= */
 body {
   font-family: Arial, sans-serif;
   background: #0f172a;
   color: white;
 }
 
-/* HEADER */
+/* ================= HEADER ================= */
 .header {
   position: sticky;
   top: 0;
@@ -40,15 +40,16 @@ body {
   background: #2563eb;
   color: white;
   font-size: 14px;
+  cursor: pointer;
 }
 
-/* LAYOUT */
+/* ================= LAYOUT ================= */
 .container {
   display: flex;
   height: calc(100vh - 60px);
 }
 
-/* EDITOR */
+/* ================= EDITOR ================= */
 .editor-panel {
   width: 50%;
   border-right: 1px solid #334155;
@@ -69,7 +70,7 @@ textarea {
   font-size: 16px;
 }
 
-/* PREVIEW */
+/* ================= PREVIEW ================= */
 .preview-panel {
   width: 50%;
   overflow-y: auto;
@@ -83,7 +84,7 @@ textarea {
   margin: auto;
 }
 
-/* ESTILO MUSICAL */
+/* PREVIEW MUSICAL */
 .section {
   font-size: 18px;
   font-weight: bold;
@@ -99,7 +100,7 @@ textarea {
   margin-right: 14px;
 }
 
-/* RESPONSIVO (iPad portrait) */
+/* ================= RESPONSIVO ================= */
 @media (max-width: 900px) {
   .container {
     flex-direction: column;
@@ -112,7 +113,7 @@ textarea {
   }
 }
 
-/* ===== PDF MODE ===== */
+/* ================= PDF MODE (NÍVEL CHORDSHEET) ================= */
 
 .pdf-mode {
   position: absolute;
@@ -120,39 +121,28 @@ textarea {
   top: 0;
 
   width: 210mm;
+  padding: 18mm;
+
   background: white;
   color: black;
 
-  padding: 20mm;
-
-  font-family: Helvetica, Arial, sans-serif;
-  font-size: 11pt;
-  line-height: 1.6;
+  font-family: "Courier New", monospace; /* 🔥 chave do alinhamento */
+  font-size: 12pt;
+  line-height: 1.8;
 }
 
-/* SEÇÕES (Intro, Refrão etc) */
+/* SEÇÕES */
 .pdf-section {
+  font-family: Helvetica, Arial, sans-serif;
   font-size: 14pt;
   font-weight: bold;
-  margin-top: 16pt;
+
+  margin-top: 18pt;
   margin-bottom: 6pt;
 }
 
-/* LINHAS DE ACORDES */
+/* LINHAS */
 .pdf-line {
+  white-space: pre; /* 🔥 mantém espaços EXATOS */
   margin-bottom: 6pt;
-  white-space: nowrap;
-}
-
-/* ACORDES */
-.pdf-chord {
-  display: inline-block;
-  min-width: 32px;   /* 🔥 alinhamento consistente */
-  font-weight: bold;
-}
-
-/* QUEBRA DE PÁGINA INTELIGENTE */
-.pdf-section,
-.pdf-line {
-  page-break-inside: avoid;
 }
