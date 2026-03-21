@@ -2,27 +2,27 @@ const editor = document.getElementById("editor");
 const preview = document.getElementById("preview");
 const fileInput = document.getElementById("fileInput");
 
-document.getElementById("updateBtn").onclick = render;
+/* ================= EVENTS ================= */
+document.getElementById("updateBtn").onclick = renderPreview;
 document.getElementById("pdfBtn").onclick = generatePDF;
 document.getElementById("importBtn").onclick = () => fileInput.click();
 
 fileInput.addEventListener("change", handleFile);
 
-/* LOAD LOCAL */
+/* ================= STORAGE ================= */
 editor.value = localStorage.getItem("chart") || "";
 
-/* AUTO SAVE */
 editor.addEventListener("input", () => {
   localStorage.setItem("chart", editor.value);
 });
 
-/* LIMPEZA */
+/* ================= CLEAN ================= */
 function cleanText(text) {
   return text.replace(/[^\x00-\x7F\n]/g, "").trim();
 }
 
-/* RENDER */
-function render() {
+/* ================= PREVIEW ================= */
+function renderPreview() {
   const text = cleanText(editor.value);
   preview.innerHTML = "";
 
@@ -39,7 +39,7 @@ function render() {
       el.className = "line";
 
       line.split(" ").forEach(chord => {
-        if (chord.trim() !== "") {
+        if (chord.trim()) {
           const span = document.createElement("span");
           span.className = "chord";
           span.textContent = chord;
@@ -52,28 +52,7 @@ function render() {
   });
 }
 
-/* PDF */
-function generatePDF() {
-  const element = renderPDFLayout();
-
-  const opt = {
-    margin: 0,
-    filename: "cifra.pdf",
-    html2canvas: {
-      scale: 3,          // 🔥 melhora MUITO a qualidade
-      useCORS: true
-    },
-    jsPDF: {
-      unit: "mm",
-      format: "a4",
-      orientation: "portrait"
-    }
-  };
-
-  html2pdf().set(opt).from(element).save();
-}
-
-/*Render PDF Layout0*/
+/* ================= PDF RENDER (CHORDSHEET STYLE) ================= */
 function renderPDFLayout() {
   const container = document.getElementById("pdf-container");
   container.innerHTML = "";
@@ -88,40 +67,64 @@ function renderPDFLayout() {
       el.className = "pdf-section";
       el.textContent = line.replace(":", "").trim();
       container.appendChild(el);
-
-    } else {
-      const el = document.createElement("div");
-      el.className = "pdf-line";
-
-      line.split(" ").forEach(chord => {
-        if (chord.trim() !== "") {
-          const span = document.createElement("span");
-          span.className = "pdf-chord";
-          span.textContent = chord;
-          el.appendChild(span);
-        }
-      });
-
-      container.appendChild(el);
+      return;
     }
 
+    const el = document.createElement("div");
+    el.className = "pdf-line";
+
+    const chords = line.trim().split(/\s+/);
+
+    let formattedLine = "";
+
+    chords.forEach((chord, index) => {
+      formattedLine += chord;
+
+      if (index < chords.length - 1) {
+        formattedLine += "     "; // 🔥 ajuste fino aqui
+      }
+    });
+
+    el.textContent = formattedLine;
+    container.appendChild(el);
   });
 
   return container;
 }
 
-/* IMPORT */
+/* ================= PDF ================= */
+function generatePDF() {
+  const element = renderPDFLayout();
+
+  const opt = {
+    margin: 0,
+    filename: "cifra.pdf",
+    html2canvas: {
+      scale: 3,
+      useCORS: true
+    },
+    jsPDF: {
+      unit: "mm",
+      format: "a4",
+      orientation: "portrait"
+    }
+  };
+
+  html2pdf().set(opt).from(element).save();
+}
+
+/* ================= IMPORT ================= */
 function handleFile(e) {
   const file = e.target.files[0];
   const reader = new FileReader();
 
   reader.onload = (evt) => {
     editor.value = evt.target.result;
-    render();
+    renderPreview();
   };
 
   reader.readAsText(file);
 }
 
-/* INIT */
-render();
+/* ================= INIT ================= */
+renderPreview();
