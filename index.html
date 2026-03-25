@@ -1,48 +1,85 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ROADMAP PRO</title>
-
-<link rel="stylesheet" href="style.css">
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <meta charset="UTF-8">
+  <title>Gerador Cifras Real Book</title>
+  <script src="https://cdn.jsdelivr.net/npm/chordsheetjs@1.9.3/dist/chordsheetjs.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+    textarea { width: 100%; height: 200px; font-family: monospace; }
+    button { padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer; margin: 10px 5px 0 0; }
+    button:hover { background: #0056b3; }
+    #preview { margin-top: 20px; border: 1px solid #ddd; padding: 20px; background: white; }
+    /* Abas Design */
+    .abas { position: relative; margin: 20px 0; }
+    .aba { display: inline-block; }
+    .aba > a { float: left; padding: 0.5em 1em; background: linear-gradient(#FFF, #EEE); border: 1px solid #CCC; border-radius: 8px 8px 0 0; text-decoration: none; color: #333; }
+    .aba:not(:target) > a { border-bottom: 0; }
+    .aba:target > a, .aba > a:hover { background: white; font-weight: bold; }
+    .conteudo { position: absolute; left: 0; top: calc(2em + 4px); z-index: -2; border: 1px solid #CCC; background: white; padding: 10px; width: 100%; box-sizing: border-box; }
+    .aba:target .conteudo { z-index: -1; }
+    .paywall { background: #fff3cd; padding: 20px; text-align: center; border: 2px dashed #ffc107; margin-top: 20px; }
+  </style>
 </head>
-
 <body>
-
-<header class="header">
-  <div class="logo">ROADMAP PRO</div>
-
-  <div class="actions">
-    <button id="updateBtn">Atualizar</button>
-    <button id="pdfBtn">PDF</button>
-    <button id="importBtn">Importar</button>
-    <input type="file" id="fileInput" hidden>
-  </div>
-</header>
-
-<main class="container">
-
-  <!-- EDITOR -->
-  <section class="editor-panel">
-    <textarea id="editor" placeholder=": Intro
+  <h1>Gerador de Cifras Real Book (MVP)</h1>
+  <textarea id="input" placeholder="Exemplo:
+:title Minha Música
+: Intro
 G C D C
 G Em C D
 
-: Refrão
-(A D E D A F#m D E)x2"></textarea>
-  </section>
+[Refrão]
+(A D E D A F#m D E)x4
 
-  <!-- PREVIEW -->
-  <section class="preview-panel">
-    <div id="preview"></div>
-  </section>
+: Final
+(A D E D A F#m D E)x3">Sua cifra aqui...</textarea><br>
+  <button onclick="preview()">Preview HTML</button>
+  <button onclick="downloadPDF()">Baixar PDF Pro (R$9)</button> <!-- Paywall aqui depois -->
 
-</main>
+  <div id="preview"></div>
 
-<div id="pdf-container" class="pdf-mode"></div>
-<script src="app.js"></script>
+  <div class="paywall">
+    <h3>PDF Premium Bloqueado</h3>
+    <p>Para PDF completo estilo Real Book, clique abaixo (integre Stripe/ManyChat).</p>
+  </div>
+
+  <!-- Abas para seções (exemplo: adicione :Intro etc na cifra) -->
+  <div class="abas">
+    <div class="aba" id="aba1"><a href="#aba1">Intro</a>
+      <div class="conteudo">
+        <h3>Intro</h3>
+        <div id="intro-content"></div>
+      </div>
+    </div>
+    <div class="aba" id="aba2"><a href="#aba2">Refrão</a>
+      <div class="conteudo">
+        <h3>Refrão</h3>
+        <div id="refrão-content"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentSong;
+    function preview() {
+      const input = document.getElementById('input').value;
+      const parser = new chordsheetjs.ChordsOverWordsParser(); // Ou ChordProParser para [chords]
+      currentSong = parser.parse(input);
+      const formatter = new chordsheetjs.HtmlDivFormatter();
+      document.getElementById('preview').innerHTML = formatter.format(currentSong);
+    }
+
+    function downloadPDF() {
+      if (!currentSong) { alert('Faça preview primeiro!'); return; }
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const formatter = new chordsheetjs.TextFormatter(); // Texto simples para PDF beta
+      doc.text(formatter.format(currentSong), 10, 10);
+      doc.save('cifra-realbook.pdf'); // Integre paywall: if(paid) save
+      // TODO: ManyChat webhook para pagamento
+    }
+  </script>
 </body>
 </html>
